@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <let name="background_r" value="200" />
+  <include file="$(find-pkg-share stereo_image_proc)/launch/stereo_image_proc.launch.py">
+    <arg name="namespace" value="stereo" />
+  </include>
+</launch>
+
+<!-- ros2 launch stereo_image_proc stereo_image_proc.launch.py namespace:=stereo -->

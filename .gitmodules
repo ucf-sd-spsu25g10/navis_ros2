@@ -1,0 +1,3 @@
+[submodule "navis_ros2_ws/src/stereo-cam"]
+	path = navis_ros2_ws/src/stereo-cam
+	url = git@github.com:signalbotics-admin/stereo-cam.git
