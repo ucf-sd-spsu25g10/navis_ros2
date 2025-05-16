@@ -18,13 +18,22 @@ add_executable(waypoint_orderer
   src/grocery_locations.cpp
 )
 
+add_executable(imu_publisher 
+  src/imu_publisher.cpp
+)
+ament_target_dependencies(imu_publisher rclcpp sensor_msgs)
+
 target_include_directories(waypoint_orderer PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
 target_compile_features(waypoint_orderer PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 
-install(TARGETS waypoint_orderer
-  DESTINATION lib/${PROJECT_NAME})
+install(TARGETS 
+  waypoint_orderer 
+  imu_publisher
+  
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 find_package(navis_msgs REQUIRED)
 
