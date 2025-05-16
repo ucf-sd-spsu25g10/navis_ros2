@@ -18,13 +18,13 @@ public:
     list_publisher_ = this->create_publisher<navis_msgs::msg::WaypointsList>("waypoints_topic", 10);
 
     // Wait until a list is received (not in a ros2 topic)
-    // grocery_list = get_unordered_list();
-    grocery_list = {"item_f",
-                    "item_b",
-                    "item_a",
-                    "item_d",
-                    "item_c",
-                    "item_e",};
+    get_unordered_list();
+    // grocery_list = {"item_f",
+    //                 "item_b",
+    //                 "item_a",
+    //                 "item_d",
+    //                 "item_c",
+    //                 "item_e",};
 
     publish_ordered_list();
   }

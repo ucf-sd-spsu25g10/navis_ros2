@@ -12,6 +12,7 @@ find_package(rclcpp_components REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
+find_package(navis_msgs REQUIRED)
 
 add_executable(waypoint_orderer 
   src/waypoint_orderer.cpp
@@ -21,7 +22,11 @@ add_executable(waypoint_orderer
 add_executable(imu_publisher 
   src/imu_publisher.cpp
 )
-ament_target_dependencies(imu_publisher rclcpp sensor_msgs)
+
+add_executable(control_out_node
+  src/control_out_node.cpp
+)
+
 
 target_include_directories(waypoint_orderer PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -31,16 +36,26 @@ target_compile_features(waypoint_orderer PUBLIC c_std_99 cxx_std_17)  # Require 
 install(TARGETS 
   waypoint_orderer 
   imu_publisher
-  
+  control_out_node
+
   DESTINATION lib/${PROJECT_NAME}
 )
-
-find_package(navis_msgs REQUIRED)
 
 ament_target_dependencies(waypoint_orderer
   navis_msgs
   rclcpp
   rclcpp_components
+)
+
+ament_target_dependencies(imu_publisher 
+  sensor_msgs
+  rclcpp 
+)
+
+ament_target_dependencies(control_out_node 
+  navis_msgs
+  rclcpp
+  rclcpp_components 
 )
 
 if(BUILD_TESTING)

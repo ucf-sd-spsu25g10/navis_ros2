@@ -13,28 +13,6 @@ using namespace std::chrono_literals;
 class IMUPublisher : public rclcpp::Node {
 public:
     IMUPublisher() : Node("imu_publisher") {
-        
-        constexpr uint8_t IMU_I2C_ADDRESS = 0x68;       // MPU6050 address
-        constexpr char IMU_I2C_FILE[] = "/dev/i2c-1";   // Typical I2C bus on Raspberry Pi
-        constexpr int IMU_READ_RATE_MS = 100;           // Poll every 100ms
-
-        // Gotten from:
-        //      https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-9250-Register-Map.pdf
-        // Accelerometer data registers
-        constexpr uint8_t ACCEL_XOUT_H = 0x3B;
-        constexpr uint8_t ACCEL_XOUT_L = 0x3C;
-        constexpr uint8_t ACCEL_YOUT_H = 0x3D;
-        constexpr uint8_t ACCEL_YOUT_L = 0x3E;
-        constexpr uint8_t ACCEL_ZOUT_H = 0x3F;
-        constexpr uint8_t ACCEL_ZOUT_L = 0x40;
-
-        // Gyroscope data registers
-        constexpr uint8_t GYRO_XOUT_H = 0x43;
-        constexpr uint8_t GYRO_XOUT_L = 0x44;
-        constexpr uint8_t GYRO_YOUT_H = 0x45;
-        constexpr uint8_t GYRO_YOUT_L = 0x46;
-        constexpr uint8_t GYRO_ZOUT_H = 0x47;
-        constexpr uint8_t GYRO_ZOUT_L = 0x48;
 
         publisher_ = this->create_publisher<sensor_msgs::msg::Imu>("imu/data_raw", 10);
         timer_ = this->create_wall_timer(std::chrono::milliseconds(IMU_READ_RATE_MS), std::bind(&IMUPublisher::read_and_publish, this));
@@ -75,14 +53,14 @@ private:
         auto imu_msg = sensor_msgs::msg::Imu();
 
         // Read accelerometer data (registers 0x3B - 0x40)
-        // int16_t acc_x = read_word(0x3B);
-        // int16_t acc_y = read_word(0x3D);
-        // int16_t acc_z = read_word(0x3F);
+        int16_t acc_x = read_word(ACCEL_XOUT_H);
+        int16_t acc_y = read_word(ACCEL_YOUT_H);
+        int16_t acc_z = read_word(ACCEL_ZOUT_H);
 
         // Read gyroscope data (registers 0x43 - 0x48)
-        // int16_t gyro_x = read_word(0x43);
-        // int16_t gyro_y = read_word(0x45);
-        // int16_t gyro_z = read_word(0x47);
+        int16_t gyro_x = read_word(GYRO_XOUT_H);
+        int16_t gyro_y = read_word(GYRO_YOUT_H);
+        int16_t gyro_z = read_word(GYRO_ZOUT_H);
 
         // Convert to m/s² and rad/s (MPU6050 full-scale default: ±2g, ±250 deg/s)
         constexpr double accel_scale = 16384.0; // 2g range
@@ -101,6 +79,28 @@ private:
 
         publisher_->publish(imu_msg);
     }
+
+    static constexpr uint8_t IMU_I2C_ADDRESS = 0x68;       // MPU6050 address
+    static constexpr char IMU_I2C_FILE[] = "/dev/i2c-1";   // Typical I2C bus on Raspberry Pi
+    static constexpr int IMU_READ_RATE_MS = 100;           // Poll every 100ms
+
+    // Gotten from:
+    //      https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-9250-Register-Map.pdf
+    // Accelerometer data registers
+    static constexpr uint8_t ACCEL_XOUT_H = 0x3B;
+    static constexpr uint8_t ACCEL_XOUT_L = 0x3C;
+    static constexpr uint8_t ACCEL_YOUT_H = 0x3D;
+    static constexpr uint8_t ACCEL_YOUT_L = 0x3E;
+    static constexpr uint8_t ACCEL_ZOUT_H = 0x3F;
+    static constexpr uint8_t ACCEL_ZOUT_L = 0x40;
+
+    // Gyroscope data registers
+    static constexpr uint8_t GYRO_XOUT_H = 0x43;
+    static constexpr uint8_t GYRO_XOUT_L = 0x44;
+    static constexpr uint8_t GYRO_YOUT_H = 0x45;
+    static constexpr uint8_t GYRO_YOUT_L = 0x46;
+    static constexpr uint8_t GYRO_ZOUT_H = 0x47;
+    static constexpr uint8_t GYRO_ZOUT_L = 0x48;
 
     int i2c_file_;
     uint8_t i2c_addr_;
