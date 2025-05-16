@@ -1,5 +1,8 @@
 #include <cstdio>
 #include <rclcpp/rclcpp.hpp>
+#include <fcntl.h>
+#include <termios.h>
+#include <unistd.h>
 
 #include "navis_msgs/msg/waypoints_list.hpp"
 #include "navis_nav/grocery_locations.hpp"
@@ -30,9 +33,55 @@ private:
   rclcpp::Publisher<navis_msgs::msg::WaypointsList>::SharedPtr list_publisher_;
   std::vector<std::string> grocery_list;
 
-  // TODO
+  std::vector<int> get_list_uart() {
+    std::vector<int> numbers;
+    const char* uart_dev = "/dev/ttyAMA1";  // RPi5 UART port
+    
+    int uart_fd = open(uart_dev, O_RDONLY | O_NOCTTY);
+    if (uart_fd < 0) {
+      RCLCPP_ERROR(this->get_logger(), "Failed to open UART");
+      return numbers;
+    }
+
+    // Configure UART
+    struct termios uart_config;
+    tcgetattr(uart_fd, &uart_config);
+    cfsetispeed(&uart_config, B115200);
+    cfmakeraw(&uart_config);
+    tcsetattr(uart_fd, TCSANOW, &uart_config);
+
+    std::string buffer;
+    char c;
+    while (true) {
+      if (read(uart_fd, &c, 1) > 0) {
+        if (c == ';') break;
+        if (c == ',') {
+          if (!buffer.empty()) {
+            numbers.push_back(std::stoi(buffer));
+            buffer.clear();
+          }
+        } else if (isdigit(c)) {
+          buffer += c;
+        }
+      }
+    }
+    
+    // Add last number if exists
+    if (!buffer.empty()) {
+      numbers.push_back(std::stoi(buffer));
+    }
+
+    close(uart_fd);
+    return numbers;
+  }
+
   void get_unordered_list() {
-    return;
+    std::vector<int> uart_list = get_list_uart();
+    grocery_list.clear();
+    
+    for (int item_num : uart_list) {
+      grocery_list.push_back("item_" + std::to_string(item_num));
+    }
   }
 
   void publish_ordered_list() {
