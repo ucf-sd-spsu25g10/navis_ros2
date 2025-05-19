@@ -15,9 +15,6 @@ public:
             rclcpp::QoS(10),
             std::bind(&ControlOutNode::write_callback, this, std::placeholders::_1)
         );
-
-        buzzer_address = 0;
-        speaker_address = 0;
         
         open_uart();
     }
@@ -64,32 +61,22 @@ private:
         }
     }
 
-    // Feel free to change address, i just dont know how we're differentiating between speaker and buzzer writes
-    void write_uart(int address, int val) {
+    void write_uart(int val) {
         if (uart_fd_ < 0) return;
 
-        uint8_t packet[3] = {
-            static_cast<uint8_t>(address),
-            static_cast<uint8_t>(val),
-            static_cast<uint8_t>(address ^ val) // Simple checksum
-        };
+        uint8_t packet = static_cast<uint8_t>(val);
 
         write(uart_fd_, packet, sizeof(packet));
     }
 
     void write_callback(const navis_msgs::msg::ControlOut::SharedPtr msg) {
-        int buzzer_strength = msg->buzzer_strength;
-        int speaker_wav_index = msg->speaker_wav_index;
+        int direction = msg->buzzer_strength;
 
-        write_uart(buzzer_address, buzzer_strength);
-        write_uart(speaker_address, speaker_wav_index);
+        write_uart(direction);
     }
 
     // Topic Subscription
     rclcpp::Subscription<navis_msgs::msg::ControlOut>::SharedPtr control_out_sub_;
-
-    int buzzer_address;
-    int speaker_address;
 
     int uart_fd_ = -1;
 
