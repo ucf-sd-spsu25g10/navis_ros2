@@ -41,6 +41,12 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME}
 )
 
+# Install assets
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}/
+)
+
 ament_target_dependencies(waypoint_orderer
   navis_msgs
   rclcpp
