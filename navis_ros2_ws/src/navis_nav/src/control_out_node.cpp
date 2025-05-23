@@ -66,7 +66,7 @@ private:
 
         uint8_t packet = static_cast<uint8_t>(val);
 
-        write(uart_fd_, packet, sizeof(packet));
+        write(uart_fd_, &packet, sizeof(packet));
     }
 
     void write_callback(const navis_msgs::msg::ControlOut::SharedPtr msg) {

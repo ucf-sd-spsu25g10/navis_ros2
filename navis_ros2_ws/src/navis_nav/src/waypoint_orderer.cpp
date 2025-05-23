@@ -15,7 +15,7 @@ public:
     RCLCPP_INFO(this->get_logger(), "Talker C++ node has been created");
 
     // Setup up Publisher to whatever list topic
-    list_publisher_ = this->create_publisher<navis_msgs::msg::WaypointsList>("waypoints_topic", 10);
+    list_publisher_ = this->create_publisher<navis_msgs::msg::WaypointsList>("waypoint_list", 10);
 
     // Wait until a list is received (not in a ros2 topic)
     get_unordered_list();
@@ -131,10 +131,14 @@ private:
 
     print_cur_list("heights sorted");
     
+    msg.waypoints.push_back("start_pose");
+
     // put in ros2 message format
     for (std::string& str : grocery_list) {
       msg.waypoints.push_back(str);
     }
+
+    msg.waypoints.push_back("final_pose");
 
     list_publisher_->publish(msg);
     return;
