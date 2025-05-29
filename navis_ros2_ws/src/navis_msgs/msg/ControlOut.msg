@@ -1,0 +1,2 @@
+int32 buzzer_strength
+int32 speaker_wav_index

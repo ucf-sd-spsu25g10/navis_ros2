@@ -1,0 +1,118 @@
+# ROS 2 build and install directories
+build/
+install/
+log/
+
+# colcon files
+.colcon_cd_root
+.colcon/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# C++
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ROS specific
+.catkin_workspace
+.catkin_tools/
+devel/
+logs/
+bag_files/
+*.bag
+
+# Custom camera calibration files
+*.yaml
+!config/*.yaml
+
+# Documentation generated files
+doc/_build/
+html/
+latex/
+
+# Backup files
+*.bak
+*.backup
+*.tmp
+
+# Environment files
+.env
+.venv/
+venv/
+ENV/
+
+# Debug files
+core.* 
