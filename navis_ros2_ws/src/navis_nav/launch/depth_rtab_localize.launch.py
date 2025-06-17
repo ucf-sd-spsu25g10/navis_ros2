@@ -12,11 +12,9 @@ from ament_index_python.packages import get_package_share_directory
 def generate_launch_description():
     # use_sim_time = LaunchConfiguration('use_sim_time')
     # localization = LaunchConfiguration('localization')
+    
     use_imu = LaunchConfiguration('use_imu')
-
     use_raspi = LaunchConfiguration('use_raspi')
-    enable_depth = LaunchConfiguration('enable_depth')
-    enable_rect = LaunchConfiguration('enable_rect')
     rviz = LaunchConfiguration('rviz')
 
     parameters=[{
@@ -25,9 +23,7 @@ def generate_launch_description():
         'subscribe_odom_info': True,
         'approx_sync': True,
         'subscribe_imu': True,
-        'use_sim_time': True
-        # 'subscribe_imu': use_imu,
-        # 'use_sim_time': use_sim_time
+        'use_sim_time': False
     }]
 
     remappings=[
@@ -49,16 +45,6 @@ def generate_launch_description():
             description='Use Raspberry Pi config if true, laptop config otherwise'
         ),
         DeclareLaunchArgument(
-            'enable_depth',
-            default_value='true',
-            description='Enable depth estimation node'
-        ),
-        DeclareLaunchArgument(
-            'enable_rect',
-            default_value='false',
-            description='Enable stereo rectification launch'
-        ),
-        DeclareLaunchArgument(
             'rviz',
             default_value='false',
             description='Whether to start RVIZ'
@@ -75,8 +61,8 @@ def generate_launch_description():
             ),
             launch_arguments={
                 'use_raspi': use_raspi,
-                'enable_depth': enable_depth,
-                'enable_rect': enable_rect,
+                'enable_depth': 'true',
+                'enable_rect': 'false',
                 'rviz': rviz
             }.items()
         ),

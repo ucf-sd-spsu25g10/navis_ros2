@@ -116,3 +116,7 @@ ENV/
 
 # Debug files
 core.* 
+
+navis_ros2_ws/left_right_image/*
+!navis_ros2_ws/left_right_image/.gitkeep
+navis_ros2_ws/temp_lr_image/
