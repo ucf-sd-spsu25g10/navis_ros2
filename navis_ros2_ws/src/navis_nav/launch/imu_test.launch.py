@@ -17,4 +17,8 @@ def generate_launch_description():
             package='navis_nav', executable='imu_publisher', output='screen',
             remappings=remappings,
         ),
+
+        Node(
+            package='navis_nav', executable='bag_recorder', output='screen',
+        )
     ])

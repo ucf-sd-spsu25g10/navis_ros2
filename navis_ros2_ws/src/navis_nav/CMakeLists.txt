@@ -15,6 +15,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(navis_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
+find_package(rosbag2_cpp REQUIRED)
 
 # Include paths
 include_directories(include)
@@ -35,6 +36,10 @@ add_executable(control_out_node
 
 add_executable(control_action_calc
   src/control_action_calc.cpp
+)
+
+add_executable(bag_recorder
+  src/bag_recorder.cpp
 )
 
 add_executable(waypoint_manager
@@ -83,6 +88,12 @@ ament_target_dependencies(waypoint_manager
   navis_msgs
 )
 
+ament_target_dependencies(bag_recorder
+  rclcpp
+  sensor_msgs
+  rosbag2_cpp
+)
+
 # Install executables
 install(TARGETS 
   waypoint_orderer 
@@ -90,6 +101,7 @@ install(TARGETS
   control_out_node
   control_action_calc
   waypoint_manager
+  bag_recorder
   DESTINATION lib/${PROJECT_NAME}
 )
 
