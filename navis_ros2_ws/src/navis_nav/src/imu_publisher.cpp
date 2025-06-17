@@ -41,26 +41,39 @@ private:
         write(i2c_file_, buffer, 2);
     }
 
-    int16_t read_word(uint8_t reg) {
+    bool read_word_checked(int i2c_fd, uint8_t reg, int16_t &out_value) {
         uint8_t buf[2];
         buf[0] = reg;
-        write(i2c_file_, buf, 1);
-        read(i2c_file_, buf, 2);
-        return (int16_t)((buf[0] << 8) | buf[1]);
+
+        if (write(i2c_fd, buf, 1) != 1) {
+            return false;
+        }
+        if (read(i2c_fd, buf, 2) != 2) {
+            return false;
+        }
+
+        out_value = (int16_t)((buf[0] << 8) | buf[1]);
+        return true;
     }
 
     void read_and_publish() {
+        int16_t acc_x, acc_y, acc_z;
+        int16_t gyro_x, gyro_y, gyro_z;
+
+        bool ok = true;
+        ok &= read_word_checked(i2c_file_, ACCEL_XOUT_H, acc_x);
+        ok &= read_word_checked(i2c_file_, ACCEL_YOUT_H, acc_y);
+        ok &= read_word_checked(i2c_file_, ACCEL_ZOUT_H, acc_z);
+        ok &= read_word_checked(i2c_file_, GYRO_XOUT_H, gyro_x);
+        ok &= read_word_checked(i2c_file_, GYRO_YOUT_H, gyro_y);
+        ok &= read_word_checked(i2c_file_, GYRO_ZOUT_H, gyro_z);
+
+        if (!ok) {
+            RCLCPP_WARN(this->get_logger(), "IMU read failed: %s", strerror(errno));
+            return; // Skip publishing invalid data
+        }
+
         auto imu_msg = sensor_msgs::msg::Imu();
-
-        // Read accelerometer data (registers 0x3B - 0x40)
-        int16_t acc_x = read_word(ACCEL_XOUT_H);
-        int16_t acc_y = read_word(ACCEL_YOUT_H);
-        int16_t acc_z = read_word(ACCEL_ZOUT_H);
-
-        // Read gyroscope data (registers 0x43 - 0x48)
-        int16_t gyro_x = read_word(GYRO_XOUT_H);
-        int16_t gyro_y = read_word(GYRO_YOUT_H);
-        int16_t gyro_z = read_word(GYRO_ZOUT_H);
 
         // Convert to m/s² and rad/s (MPU6050 full-scale default: ±2g, ±250 deg/s)
         constexpr double accel_scale = 16384.0; // 2g range
