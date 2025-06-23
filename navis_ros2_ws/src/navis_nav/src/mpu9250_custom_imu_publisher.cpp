@@ -10,12 +10,12 @@
 
 using namespace std::chrono_literals;
 
-class IMUPublisher : public rclcpp::Node {
+class MPUIMUPublisher : public rclcpp::Node {
 public:
-    IMUPublisher() : Node("imu_publisher") {
+    MPUIMUPublisher() : Node("mpu9250_custom_imu_publisher") {
 
         publisher_ = this->create_publisher<sensor_msgs::msg::Imu>("imu/data_raw", 10);
-        timer_ = this->create_wall_timer(std::chrono::milliseconds(IMU_READ_RATE_MS), std::bind(&IMUPublisher::read_and_publish, this));
+        timer_ = this->create_wall_timer(std::chrono::milliseconds(IMU_READ_RATE_MS), std::bind(&MPUIMUPublisher::read_and_publish, this));
 
         // Open I2C device
         if ((i2c_file_ = open(IMU_I2C_FILE, O_RDWR)) < 0) {
@@ -123,7 +123,7 @@ private:
 
 int main(int argc, char *argv[]) {
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<IMUPublisher>());
+    rclcpp::spin(std::make_shared<MPUIMUPublisher>());
     rclcpp::shutdown();
     return 0;
 }

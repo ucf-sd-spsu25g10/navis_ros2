@@ -95,7 +95,7 @@ def generate_launch_description():
 
         # IMU Publisher and Processing
         Node(
-            package='navis_nav', executable='imu_publisher', output='screen',
+            package='navis_nav', executable='mpu9250_custom_imu_publisher', output='screen',
             condition=IfCondition(use_imu),
             parameters=[parameters],
             remappings=remappings,

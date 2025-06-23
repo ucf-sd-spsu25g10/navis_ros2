@@ -26,8 +26,8 @@ add_executable(waypoint_orderer
   src/grocery_locations.cpp
 )
 
-add_executable(imu_publisher 
-  src/imu_publisher.cpp
+add_executable(mpu9250_custom_imu_publisher 
+  src/mpu9250_custom_imu_publisher.cpp
 )
 
 add_executable(control_out_node
@@ -48,7 +48,7 @@ add_executable(waypoint_manager
 )
 
 # Include dirs per target
-foreach(target IN ITEMS waypoint_orderer imu_publisher control_out_node waypoint_manager control_action_calc)
+foreach(target IN ITEMS waypoint_orderer mpu9250_custom_imu_publisher control_out_node waypoint_manager control_action_calc)
   target_include_directories(${target} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
@@ -63,7 +63,7 @@ ament_target_dependencies(waypoint_orderer
   navis_msgs
 )
 
-ament_target_dependencies(imu_publisher 
+ament_target_dependencies(mpu9250_custom_imu_publisher 
   rclcpp 
   sensor_msgs
 )
@@ -97,7 +97,7 @@ ament_target_dependencies(bag_recorder
 # Install executables
 install(TARGETS 
   waypoint_orderer 
-  imu_publisher
+  mpu9250_custom_imu_publisher
   control_out_node
   control_action_calc
   waypoint_manager

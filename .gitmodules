@@ -1,3 +1,11 @@
 [submodule "navis_ros2_ws/src/stereo-cam"]
 	path = navis_ros2_ws/src/stereo-cam
 	url = git@github.com:adenm-10/stereo-cam.git
+
+[submodule "navis_ros2_ws/src/ros2_mpu9250_driver"]
+	path = navis_ros2_ws/src/ros2_mpu9250_driver
+	url = git@github.com:adenm-10/navis_mpu9250_driver.git
+
+# [submodule "navis_ros2_ws/src/ros2_bmi323_driver"]
+# 	path = navis_ros2_ws/src/ros2_bmi323_driver
+# 	url = git@github.com:adenm-10/ros2_bmi323_driver.git
