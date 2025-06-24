@@ -21,10 +21,6 @@ find_package(rosbag2_cpp REQUIRED)
 include_directories(include)
 
 # Executables
-add_executable(mpu9250_custom_imu_publisher 
-  src/mpu9250_custom_imu_publisher.cpp
-)
-
 add_executable(control_out_node
   src/control_out_node.cpp
 )
@@ -44,7 +40,7 @@ add_executable(waypoint_manager
 )
 
 # Include dirs per target
-foreach(target IN ITEMS mpu9250_custom_imu_publisher control_out_node waypoint_manager control_action_calc)
+foreach(target IN ITEMS control_out_node waypoint_manager control_action_calc)
   target_include_directories(${target} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
@@ -58,11 +54,6 @@ ament_target_dependencies(waypoint_manager
   std_msgs
   geometry_msgs
   navis_msgs
-)
-
-ament_target_dependencies(mpu9250_custom_imu_publisher 
-  rclcpp 
-  sensor_msgs
 )
 
 ament_target_dependencies(control_out_node 
@@ -86,7 +77,6 @@ ament_target_dependencies(bag_recorder
 
 # Install executables
 install(TARGETS 
-  mpu9250_custom_imu_publisher
   control_out_node
   control_action_calc
   waypoint_manager

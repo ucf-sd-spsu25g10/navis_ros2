@@ -51,25 +51,31 @@ private:
     WaypointOrderer waypoint_orderer;
 
     std::unordered_map<std::string, int> wav_map = {
-        {"left", 0},            // Turn left 90 degrees (when reach bottom of aisle)
-        {"right", 1},           // Turn right 90 degrees (when reach top of aisle)
-        {"turnaround", 2},      // Do a 180
-        {"final", 3},           // Final Destination reached
-        {"shelf_1", 4},         // Item on shelf #
-        {"shelf_2", 5},
-        {"shelf_3", 6},
-        {"item_l", 7},          // Item on left / right
-        {"item_r", 8},
-        {"straight_1",  9},     // Go straight # meters
-        {"straight_2",  10},
-        {"straight_3",  11},
-        {"straight_4",  12},
-        {"straight_5",  13},
-        {"straight_6",  14},
-        {"straight_7",  15},
-        {"straight_8",  16},
-        {"straight_9",  17},
-        {"straight_10", 18},
+        {"first", 1},       // "With assistance, please navigate to" -> aisle (20) -> number (9-18)
+        {"final", 2},       // "Obtained final item, please navigate to checkout with assistance"
+
+        {"turn", 3},        // "Please turn" -> left/right/around (4-6)
+        {"left", 4},        // "Left"
+        {"right", 5},       // "Right"
+        {"around", 6},      // "Around"
+
+        {"straight", 7},    // "Please go straight" -> # (9-18) -> meters (8)
+        {"meters", 8},      // "Meters"
+        {"1",  9},          // "1"
+        {"2",  10},         // .
+        {"3",  11},         // .
+        {"4",  12},         // .
+        {"5",  13},         // .
+        {"6",  14},         // .
+        {"7",  15},         // .
+        {"8",  16},         // .
+        {"9",  17},         // .
+        {"10", 18},         // "10"
+
+        {"item", 19},       // "Item is on" -> shelf (4) -> # (9-18) 
+                            // "Item is on" -> left/right (4/5)
+        {"aisle", 20},      // "Aisle"
+        {"shelf", 21},      // "Shelf"
     };
 
     int sleep_time_ms = 500;
@@ -84,16 +90,26 @@ private:
 
         if (x_or_y) {
             distance_to_next = std::min(10.0f, 
-                               std::round(std::abs(store_map[waypoint_list[cur_waypoint_idx+1]].cont_y - 
-                                                   store_map[waypoint_list[cur_waypoint_idx]].cont_y)));
+                               std::round(std::abs(store_map[waypoint_list[cur_waypoint_idx+1]].disc_y - 
+                                                   store_map[waypoint_list[cur_waypoint_idx]].disc_y)));
         } else {
             distance_to_next = std::min(10.0f, 
-                               std::round(std::abs(store_map[waypoint_list[cur_waypoint_idx+1]].cont_y - 
-                                                   store_map[waypoint_list[cur_waypoint_idx]].cont_y)));
+                               std::round(std::abs(store_map[waypoint_list[cur_waypoint_idx+1]].disc_y - 
+                                                   store_map[waypoint_list[cur_waypoint_idx]].disc_y)));
         }
 
-        control_msg.speaker_wav_index = wav_map["straight_" + std::to_string(distance_to_next)];
+        std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+        control_msg.speaker_wav_index = wav_map["straight"];
         speaker_publisher_->publish(control_msg);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+        control_msg.speaker_wav_index = wav_map[std::to_string(distance_to_next)];
+        speaker_publisher_->publish(control_msg);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+        control_msg.speaker_wav_index = wav_map["meters"];
+        speaker_publisher_->publish(control_msg);
+
         RCLCPP_INFO(this->get_logger(), "Indicating go straight %d meters", distance_to_next);
     }
 
@@ -119,42 +135,110 @@ private:
             // Spin til we have grocery list
             while (number_of_waypoints == 0) {}
 
+            // First Waypoint
+            if (cur_waypoint_idx == 0) {
+                RCLCPP_INFO(this->get_logger(), "First Waypoint Reached, Indicating to navigate to aisle %d with assistance", store_map[waypoint_list[cur_waypoint_idx+1]].aisle);
+                
+                control_msg.speaker_wav_index = wav_map["first"];
+                speaker_publisher_->publish(control_msg);
+            
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+                control_msg.speaker_wav_index = wav_map["aisle"];
+                speaker_publisher_->publish(control_msg);
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+                control_msg.speaker_wav_index = wav_map[std::to_string(store_map[cur_waypoint_str].aisle)];
+                speaker_publisher_->publish(control_msg);
+            }
+
             // Final Waypoint
-            if (cur_waypoint_idx + 1 == number_of_waypoints) {
+            else if (cur_waypoint_idx + 1 == number_of_waypoints) {
                 control_msg.speaker_wav_index = wav_map["final"];
                 speaker_publisher_->publish(control_msg);
                 RCLCPP_INFO(this->get_logger(), "Final Waypoint Reached, %s", cur_waypoint_str.c_str());
             }
 
-            // Navigate to Final Waypoint
-            if (cur_waypoint_idx + 2 == number_of_waypoints) {
-                control_msg.speaker_wav_index = wav_map["final"];
-                speaker_publisher_->publish(control_msg);
-                RCLCPP_INFO(this->get_logger(), "Navigating to Final Waypoint, %s", cur_waypoint_str.c_str());
-                add_go_straight_cmd(true);
-            }
-
             // Final Item
-            if (cur_waypoint_idx + 3 == number_of_waypoints) {
-                control_msg.speaker_wav_index = wav_map["turnaround"];
+            else if (cur_waypoint_idx + 2 == number_of_waypoints) {
+
+                // side_of_aisle -> true = left when looking at the aisle from the bottom
+                // l_r = l_r if headed up, !l_r if headed down
+                bool l_r = ((store_map[waypoint_list[cur_waypoint_idx]].disc_y - store_map[cur_waypoint_str].disc_y) >= 0 ) 
+                            ?  store_map[cur_waypoint_str].side_of_aisle 
+                            : !store_map[cur_waypoint_str].side_of_aisle;
+                std::string l_r_str = (l_r) ? "left" : "right";
+
+                control_msg.speaker_wav_index = wav_map["item"];
                 speaker_publisher_->publish(control_msg);
-                RCLCPP_INFO(this->get_logger(), "Final Item Obtained, %s", cur_waypoint_str.c_str());
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+                control_msg.speaker_wav_index = wav_map[l_r_str];
+                speaker_publisher_->publish(control_msg);
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+                control_msg.speaker_wav_index = wav_map["shelf"];
+                speaker_publisher_->publish(control_msg);
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+                control_msg.speaker_wav_index = wav_map[std::to_string(store_map[cur_waypoint_str].shelf_height)];
+                speaker_publisher_->publish(control_msg);
+                
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+                control_msg.speaker_wav_index = wav_map["turn"];
+                speaker_publisher_->publish(control_msg);
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+                control_msg.speaker_wav_index = wav_map["around"];
+                speaker_publisher_->publish(control_msg);
+                
                 add_go_straight_cmd(false);
+                
+                RCLCPP_INFO(this->get_logger(), "Final Item %s Reached, Indicating shelf %d, Indicating on side %s, Indicating turn around", cur_waypoint_str.c_str(), store_map[cur_waypoint_str].shelf_height, l_r_str.c_str());
             }
 
             // Item 
-            if (cur_waypoint_str.find("item") != std::string::npos) {
-                control_msg.speaker_wav_index = wav_map["shelf_" + store_map[cur_waypoint_str].shelf_height];
+            else if (cur_waypoint_str.find("item") != std::string::npos) {
+                
+                // side_of_aisle -> true = left when looking at the aisle from the bottom
+                // l_r = l_r if headed up, !l_r if headed down
+                bool l_r = ((store_map[waypoint_list[cur_waypoint_idx]].disc_y - store_map[cur_waypoint_str].disc_y) >= 0 ) 
+                            ?  store_map[cur_waypoint_str].side_of_aisle 
+                            : !store_map[cur_waypoint_str].side_of_aisle;
+                std::string l_r_str = (l_r) ? "left" : "right";
+
+                control_msg.speaker_wav_index = wav_map["item"];
                 speaker_publisher_->publish(control_msg);
-                RCLCPP_INFO(this->get_logger(), "Item %s Reached, Indicating shelf %d", cur_waypoint_str.c_str(), store_map[cur_waypoint_str].shelf_height);
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+                control_msg.speaker_wav_index = wav_map[l_r_str];
+                speaker_publisher_->publish(control_msg);
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+                control_msg.speaker_wav_index = wav_map["shelf"];
+                speaker_publisher_->publish(control_msg);
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+                control_msg.speaker_wav_index = wav_map[std::to_string(store_map[cur_waypoint_str].shelf_height)];
+                speaker_publisher_->publish(control_msg);
+                
+                RCLCPP_INFO(this->get_logger(), "Item %s Reached, Indicating shelf %d, Indicating on side %s", cur_waypoint_str.c_str(), store_map[cur_waypoint_str].shelf_height, l_r_str.c_str());
+
                 add_go_straight_cmd(false);
+
             }
 
             // End of Aisle
-            if (cur_waypoint_str.find("aisle") != std::string::npos) {
-                control_msg.speaker_wav_index = (cur_waypoint_str.find("bottom") != std::string::npos) ? wav_map["left"] : wav_map["right"];
+            else if (cur_waypoint_str.find("aisle") != std::string::npos) {
+                std::string l_r = (cur_waypoint_str.find("bottom") != std::string::npos) ? "left" : "right";
+                RCLCPP_INFO(this->get_logger(), "End of Aisle %s Reached, Indicating turn %s", cur_waypoint_str.c_str(), l_r.c_str());
+                
+                control_msg.speaker_wav_index = wav_map["turn"];
                 speaker_publisher_->publish(control_msg);
-                RCLCPP_INFO(this->get_logger(), "End of Aisle Reached, %s", cur_waypoint_str.c_str());
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+                control_msg.speaker_wav_index = wav_map[l_r];
+                speaker_publisher_->publish(control_msg);
+                
                 add_go_straight_cmd(true);
             }
             
@@ -164,11 +248,12 @@ private:
             geometry_msgs::msg::PoseStamped next_goal_msg;
             next_goal_msg.header.frame_id = "map";
             next_goal_msg.header.stamp = this->now();
-            next_goal_msg.pose.position.x = aisle_x_disc2cont_map[store_map[waypoint_list[cur_waypoint_idx]].aisle];  // your logic here
+            next_goal_msg.pose.position.x = store_map[waypoint_list[cur_waypoint_idx]].cont_x;  // your logic here
             next_goal_msg.pose.position.y = store_map[waypoint_list[cur_waypoint_idx]].cont_y;
             next_goal_msg.pose.orientation.w = 1.0;
 
             waypoint_publisher_->publish(next_goal_msg);
+            RCLCPP_INFO(this->get_logger(), "\n");
 
         }
     }

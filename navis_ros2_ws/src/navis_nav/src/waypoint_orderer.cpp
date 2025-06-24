@@ -86,7 +86,7 @@ void WaypointOrderer::get_unordered_list() {
           grocery_list.begin() + start_window, 
           grocery_list.begin() + end_window, 
           [&](std::string& a, std::string& b) {
-            return ascending ? (store_map[a].cont_y < store_map[b].cont_y) : (store_map[a].cont_y > store_map[b].cont_y);
+            return ascending ? (store_map[a].disc_y < store_map[b].disc_y) : (store_map[a].disc_y > store_map[b].disc_y);
         });
 
         cur_aisle = store_map[str].aisle;
@@ -101,7 +101,7 @@ void WaypointOrderer::get_unordered_list() {
       grocery_list.begin() + start_window, 
       grocery_list.begin() + end_window, 
       [&](std::string& a, std::string& b) {
-        return ascending ? (store_map[a].cont_y < store_map[b].cont_y) : (store_map[a].cont_y > store_map[b].cont_y);
+        return ascending ? (store_map[a].disc_y < store_map[b].disc_y) : (store_map[a].disc_y > store_map[b].disc_y);
     });
 
     
@@ -109,7 +109,6 @@ void WaypointOrderer::get_unordered_list() {
     int last_aisle = store_map[grocery_list[grocery_list.size()-1]].aisle;
     grocery_list.pop_back();
     grocery_list.insert(grocery_list.begin() + grocery_list.size(), "aisle" + std::to_string(last_aisle) + "_bottom");
-    grocery_list.insert(grocery_list.begin() + grocery_list.size(), "final_pose");
     
     print_cur_list("heights sorted");
 
@@ -163,7 +162,7 @@ void WaypointOrderer::print_cur_list(std::string comment) {
   std::cout << comment << std::endl;
   std::cout << "item, aisle, height" << std::endl;
   for (std::string& str : grocery_list) {
-    std::cout << str << ", " << store_map[str].aisle << ", " << store_map[str].cont_y << std::endl;
+    std::cout << str << ", " << store_map[str].aisle << ", " << store_map[str].disc_y << std::endl;
   }
   std::cout << "----------------------------\n" << std::endl;
 }
