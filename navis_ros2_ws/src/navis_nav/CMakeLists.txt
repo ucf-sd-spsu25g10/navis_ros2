@@ -21,11 +21,6 @@ find_package(rosbag2_cpp REQUIRED)
 include_directories(include)
 
 # Executables
-add_executable(waypoint_orderer 
-  src/waypoint_orderer.cpp
-  src/grocery_locations.cpp
-)
-
 add_executable(mpu9250_custom_imu_publisher 
   src/mpu9250_custom_imu_publisher.cpp
 )
@@ -45,10 +40,11 @@ add_executable(bag_recorder
 add_executable(waypoint_manager
   src/waypoint_manager.cpp
   src/grocery_locations.cpp
+  src/waypoint_orderer.cpp
 )
 
 # Include dirs per target
-foreach(target IN ITEMS waypoint_orderer mpu9250_custom_imu_publisher control_out_node waypoint_manager control_action_calc)
+foreach(target IN ITEMS mpu9250_custom_imu_publisher control_out_node waypoint_manager control_action_calc)
   target_include_directories(${target} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
@@ -57,9 +53,10 @@ foreach(target IN ITEMS waypoint_orderer mpu9250_custom_imu_publisher control_ou
 endforeach()
 
 # Dependencies per target
-ament_target_dependencies(waypoint_orderer
+ament_target_dependencies(waypoint_manager
   rclcpp
-  rclcpp_components
+  std_msgs
+  geometry_msgs
   navis_msgs
 )
 
@@ -81,13 +78,6 @@ ament_target_dependencies(control_action_calc
   navis_msgs
 )
 
-ament_target_dependencies(waypoint_manager
-  rclcpp
-  std_msgs
-  geometry_msgs
-  navis_msgs
-)
-
 ament_target_dependencies(bag_recorder
   rclcpp
   sensor_msgs
@@ -96,7 +86,6 @@ ament_target_dependencies(bag_recorder
 
 # Install executables
 install(TARGETS 
-  waypoint_orderer 
   mpu9250_custom_imu_publisher
   control_out_node
   control_action_calc
