@@ -28,7 +28,7 @@ def generate_launch_description():
     ekf_config_path = os.path.join(stereo_pkg_dir, 'config', 'odom', 'ekf.yaml')
     ekf_params = ParameterFile(ekf_config_path)
 
-    mpu_imu_config_path = os.path.join(imu_pkg_dir, 'config', 'odom', 'mpu_imu.yaml')
+    mpu_imu_config_path = os.path.join(imu_pkg_dir, 'params', 'mpu_imu.yaml')
     mpu_imu_params = ParameterFile(mpu_imu_config_path)
 
     rtabmap_params = ParameterFile(
