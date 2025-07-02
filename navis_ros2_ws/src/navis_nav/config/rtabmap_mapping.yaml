@@ -1,33 +1,31 @@
-rtabmap:
-  ros__parameters:
-    Mem/IncrementalMemory: "true"
-    Mem/InitWMWithAllNodes: "false"
+Mem/IncrementalMemory: true
+Mem/InitWMWithAllNodes: false
 
-    Grid/FromDepth: "true"                  # Build 2D occupancy grid from depth (or stereo)
-    Grid/3D: "false"                        # Only 2D projection
-    RGBD/CreateOccupancyGrid: "true" 
-    Rtabmap/DatabasePath: "~/rtab_maps/map.db"
+Grid/FromDepth: true
+Grid/3D: false
+RGBD/CreateOccupancyGrid: true
+Rtabmap/DatabasePath: "/home/aden/rtab_maps/map.db"
 
-    Reg/Force3DoF: "true"                   # Only optimize x, y, yaw (2D robot assumption)
-    RGBD/OptimizeMaxError: "3.0"
-    Optimizer/Slam2D: "true"
+Reg/Force3DoF: true
+RGBD/OptimizeMaxError: 3.0
+Optimizer/Slam2D: true
 
-    cloud_noise_filtering_radius: "0.05"
-    cloud_noise_filtering_min_neighbors: "2"
+cloud_noise_filtering_radius: 0.05
+cloud_noise_filtering_min_neighbors: 2
 
-    Rtabmap/MaxRetrieved: 1              # Fewer neighbors to save CPU
-    Rtabmap/MaxLoopClosureDistance: "10.0"  # Meters, limit loop closure attempts
-    Rtabmap/LoopThr: "0.11"                # Loop closure detection threshold (default ~0.11)
+Rtabmap/MaxRetrieved: 1
+Rtabmap/MaxLoopClosureDistance: 10.0
+Rtabmap/LoopThr: 0.11
 
-    subscribe_depth:  False
-    subscribe_rgbd:   False
-    subscribe_rgb:    False
-    subscribe_stereo: True
-    subscribe_scan:   False
+subscribe_depth: false
+subscribe_rgbd: false
+subscribe_rgb: false
+subscribe_stereo: true
+subscribe_scan: false
 
-    approx_sync: True
-    approx_sync_max_interval: 0.01
-    use_sim_time: False
+approx_sync: true
+approx_sync_max_interval: 0.01
+use_sim_time: false
 
 
 
