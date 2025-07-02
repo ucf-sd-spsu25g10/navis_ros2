@@ -19,9 +19,11 @@ rtabmap:
     Rtabmap/MaxLoopClosureDistance: "10.0"  # Meters, limit loop closure attempts
     Rtabmap/LoopThr: "0.11"                # Loop closure detection threshold (default ~0.11)
 
-    subscribe_depth:  False
+    subscribe_depth: False
+    subscribe_rgbd: False
+    subscribe_rgb: False
     subscribe_stereo: True
-    subscribe_rgb:    False
+    subscribe_scan: False
 
     approx_sync: True
     approx_sync_max_interval: 0.01
