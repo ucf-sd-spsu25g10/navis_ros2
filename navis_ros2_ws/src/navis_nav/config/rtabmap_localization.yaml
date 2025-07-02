@@ -18,10 +18,9 @@ rtabmap:
     Rtabmap/MaxLoopClosureDistance: "10.0" # Limit search range for relocalization
     Rtabmap/LoopThr: "0.11" 
 
-    frame_id: 'base_link'
-    subscribe_depth: False
-    subscribe_stereo: True
-    subscribe_rgb: False
+    subscribe_depth: "false"
+    subscribe_stereo: "true"
+    subscribe_rgb: "false"
 
     approx_sync: true
     approx_sync_max_interval: 0.01
