@@ -11,7 +11,7 @@ from launch_ros.parameter_descriptions import ParameterFile
 from launch.actions import (
     DeclareLaunchArgument, OpaqueFunction, GroupAction
 )
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import (
     LaunchConfiguration, PythonExpression, Command
 )
@@ -31,18 +31,16 @@ def generate_launch_description():
     mpu_imu_config_path = os.path.join(imu_pkg_dir, 'params', 'mpu_imu.yaml')
     mpu_imu_params = ParameterFile(mpu_imu_config_path)
 
-    rtabmap_params = ParameterFile(
-        PathJoinSubstitution([
-            nav_pkg_dir,
-            'config',
-            PythonExpression([
-                '"rtabmap_localization.yaml" if "', LaunchConfiguration('enable_mapping'), '" == "false" else "rtabmap_mapping.yaml"'
-            ])
-        ])
-    )
+    mapping_config_path = os.path.join(nav_pkg_dir, 'config', 'rtabmap_mapping.yaml')
+    mapping_params = ParameterFile(mapping_config_path)
+
+    localize_config_path = os.path.join(nav_pkg_dir, 'config', 'rtabmap_localization.yaml')
+    localize_params = ParameterFile(mapping_config_path)
+
 
 
     log_level = LaunchConfiguration('log_level')
+    enable_mapping = LaunchConfiguration('enable_mapping')
 
 
     return LaunchDescription([
@@ -94,12 +92,28 @@ def generate_launch_description():
             executable='rtabmap',
             name='rtabmap',
             output='screen',
-            parameters=[rtabmap_params],
+            parameters=[localize_params],
             remappings=[
                 ('/left/camera_info', '/left/camera_info_rect'),
                 ('/right/camera_info', '/right/camera_info_rect'),
                 ('odom', '/odom'),
             ],
-            arguments=['--ros-args', '--log-level', log_level]
+            arguments=['--ros-args', '--log-level', log_level],
+            condition=UnlessCondition(enable_mapping),
+        ),
+
+        Node(
+            package='rtabmap_slam',
+            executable='rtabmap',
+            name='rtabmap',
+            output='screen',
+            parameters=[mapping_params],
+            remappings=[
+                ('/left/camera_info', '/left/camera_info_rect'),
+                ('/right/camera_info', '/right/camera_info_rect'),
+                ('odom', '/odom'),
+            ],
+            arguments=['--ros-args', '--log-level', log_level],
+            condition=IfCondition(enable_mapping),
         ),
     ])
