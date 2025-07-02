@@ -32,9 +32,15 @@ def generate_launch_description():
     mpu_imu_params = ParameterFile(mpu_imu_config_path)
 
     rtabmap_params = ParameterFile(
-        os.path.join(nav_pkg_dir, 'config', PythonExpression([
-            '"rtabmap_localization.yaml" if "', LaunchConfiguration('localization'), '" == "true" else "rtabmap_mapping.yaml"'
-    ])))
+        PathJoinSubstitution([
+            nav_pkg_dir,
+            'config',
+            PythonExpression([
+                '"rtabmap_localization.yaml" if "', LaunchConfiguration('enable_mapping'), '" == "false" else "rtabmap_mapping.yaml"'
+            ])
+        ])
+    )
+
 
     log_level = LaunchConfiguration('log_level')
 
