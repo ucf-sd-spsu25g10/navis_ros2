@@ -1,22 +1,22 @@
 rtabmap:
   ros__parameters:
-    Mem/IncrementalMemory: false
-    Mem/InitWMWithAllNodes: true
+    Mem/IncrementalMemory: "false"
+    Mem/InitWMWithAllNodes: "true"
 
-    Grid/FromDepth: true
-    Grid/3D: false
-    RGBD/CreateOccupancyGrid: true
+    Grid/FromDepth: "true"
+    Grid/3D: "false"
+    RGBD/CreateOccupancyGrid: "true"
     Rtabmap/DatabasePath: "~/rtab_maps/map.db"
 
-    Reg/Force3DoF: true
-    Optimizer/Slam2D: true
+    Reg/Force3DoF: "true"
+    Optimizer/Slam2D: "true"
 
-    cloud_noise_filtering_radius: 0.05
-    cloud_noise_filtering_min_neighbors: 2
+    cloud_noise_filtering_radius: "0.05"
+    cloud_noise_filtering_min_neighbors: "2"
 
-    Rtabmap/MaxRetrieved: 1             # Fewer retrieved nodes to reduce CPU
-    Rtabmap/MaxLoopClosureDistance: 10.0 # Limit search range for relocalization
-    Rtabmap/LoopThr: 0.11 
+    Rtabmap/MaxRetrieved: "1"             # Fewer retrieved nodes to reduce CPU
+    Rtabmap/MaxLoopClosureDistance: "10.0" # Limit search range for relocalization
+    Rtabmap/LoopThr: "0.11" 
 
     frame_id: 'base_link'
     subscribe_depth: False

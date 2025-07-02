@@ -1,23 +1,23 @@
 rtabmap:
   ros__parameters:
-    Mem/IncrementalMemory: True
-    Mem/InitWMWithAllNodes: False
+    Mem/IncrementalMemory: "true"
+    Mem/InitWMWithAllNodes: "false"
 
-    Grid/FromDepth: true                  # Build 2D occupancy grid from depth (or stereo)
-    Grid/3D: false                        # Only 2D projection
-    RGBD/CreateOccupancyGrid: true 
+    Grid/FromDepth: "true"                  # Build 2D occupancy grid from depth (or stereo)
+    Grid/3D: "false"                        # Only 2D projection
+    RGBD/CreateOccupancyGrid: "true" 
     Rtabmap/DatabasePath: "~/rtab_maps/map.db"
 
-    Reg/Force3DoF: true                   # Only optimize x, y, yaw (2D robot assumption)
-    RGBD/OptimizeMaxError: 3.0
-    Optimizer/Slam2D: true
+    Reg/Force3DoF: "true"                   # Only optimize x, y, yaw (2D robot assumption)
+    RGBD/OptimizeMaxError: "3.0"
+    Optimizer/Slam2D: "true"
 
-    cloud_noise_filtering_radius: 0.05
-    cloud_noise_filtering_min_neighbors: 2
+    cloud_noise_filtering_radius: "0.05"
+    cloud_noise_filtering_min_neighbors: "2"
 
     Rtabmap/MaxRetrieved: 1              # Fewer neighbors to save CPU
-    Rtabmap/MaxLoopClosureDistance: 10.0  # Meters, limit loop closure attempts
-    Rtabmap/LoopThr: 0.11                # Loop closure detection threshold (default ~0.11)
+    Rtabmap/MaxLoopClosureDistance: "10.0"  # Meters, limit loop closure attempts
+    Rtabmap/LoopThr: "0.11"                # Loop closure detection threshold (default ~0.11)
 
     frame_id: 'base_link'
     subscribe_depth: False
