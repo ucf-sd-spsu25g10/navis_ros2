@@ -8,6 +8,8 @@
 #include <chrono>
 #include <thread>
 
+#include <gpiod.h>
+
 #include "std_msgs/msg/bool.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "navis_msgs/msg/waypoints_list.hpp"
@@ -35,6 +37,11 @@ public:
         cur_waypoint_idx = 0;
         number_of_waypoints = 0;
 
+        // Starting thread for GPIO button press
+        while(rclcpp::ok() && keep_running_) {
+            gpio_thread_ = std::thread(&WaypointManager::gpio_interrupt_loop, this);
+        }
+
         get_list();
     }
 
@@ -49,6 +56,9 @@ private:
     int cur_waypoint_idx, number_of_waypoints;
 
     WaypointOrderer waypoint_orderer;
+
+    std::thread gpio_thread_;
+    std::atomic<bool> keep_running_{true};
 
     std::unordered_map<std::string, int> wav_map = {
         {"first", 0},       // "With assistance, please navigate to" -> aisle (19) -> number (8-17)
@@ -121,6 +131,53 @@ private:
 
         // TODO Indiciating to ensure we are at the start location
     }
+
+void gpio_interrupt_loop() {
+    const char* chipname = "gpiochip0";
+    const unsigned int pin_num = 17; // TODO CHANGE ME
+
+    gpiod_chip* chip = gpiod_chip_open_by_name(chipname);
+    if (!chip) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to open GPIO chip");
+        return;
+    }
+
+    gpiod_line* pin = gpiod_chip_get_line(chip, pin_num);
+    if (!pin) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to get GPIO line");
+        gpiod_chip_close(chip);
+        return;
+    }
+
+    if (gpiod_line_request_rising_edge_events(pin, "ros2_button") < 0) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to request events on GPIO line");
+        gpiod_chip_close(chip);
+        return;
+    }
+
+    RCLCPP_INFO(this->get_logger(), "Waiting for button press...");
+
+    while (rclcpp::ok() && keep_running_) {
+        struct gpiod_line_event event;
+        int ret = gpiod_line_event_wait(pin, nullptr);
+
+        if (ret < 0) {
+            RCLCPP_ERROR(this->get_logger(), "Error waiting for GPIO event");
+            break;
+        } else if (ret == 0) {
+            continue;
+        }
+
+        if (gpiod_line_event_read(pin, &event) == 0) {
+            auto msg = std_msgs::msg::Bool();
+            msg.data = true;
+            goal_reached_callback(msg);
+        }
+    }
+
+    gpiod_line_release(pin);
+    gpiod_chip_close(chip);
+}
 
     void goal_reached_callback(const std_msgs::msg::Bool::SharedPtr msg) {
         
@@ -266,5 +323,9 @@ int main(int argc, char ** argv)
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<WaypointManager>());
   rclcpp::shutdown();
+  keep_running_ = false;
+  if(gpio_thread_.joinable()) {
+    gpio_thread_.join();
+  }
   return 0;
 }
