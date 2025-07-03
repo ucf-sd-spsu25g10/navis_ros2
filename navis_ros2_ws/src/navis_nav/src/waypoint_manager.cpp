@@ -51,31 +51,31 @@ private:
     WaypointOrderer waypoint_orderer;
 
     std::unordered_map<std::string, int> wav_map = {
-        {"first", 1},       // "With assistance, please navigate to" -> aisle (20) -> number (9-18)
-        {"final", 2},       // "Obtained final item, please navigate to checkout with assistance"
+        {"first", 0},       // "With assistance, please navigate to" -> aisle (19) -> number (8-17)
+        {"final", 1},       // "Obtained final item, please navigate to checkout with assistance"
 
-        {"turn", 3},        // "Please turn" -> left/right/around (4-6)
-        {"left", 4},        // "Left"
-        {"right", 5},       // "Right"
-        {"around", 6},      // "Around"
+        {"turn", 2},        // "Please turn" -> left/right/around (3-5)
+        {"left", 3},        // "Left"
+        {"right", 4},       // "Right"
+        {"around", 5},      // "Around"
 
-        {"straight", 7},    // "Please go straight" -> # (9-18) -> meters (8)
-        {"meters", 8},      // "Meters"
-        {"1",  9},          // "1"
-        {"2",  10},         // .
-        {"3",  11},         // .
-        {"4",  12},         // .
-        {"5",  13},         // .
-        {"6",  14},         // .
-        {"7",  15},         // .
-        {"8",  16},         // .
-        {"9",  17},         // .
-        {"10", 18},         // "10"
+        {"straight", 6},    // "Please go straight" -> # (8-17) -> meters (7)
+        {"meters", 7},      // "Meters"
+        {"1",  8},          // "1"
+        {"2",  9},         // .
+        {"3",  10},         // .
+        {"4",  11},         // .
+        {"5",  12},         // .
+        {"6",  13},         // .
+        {"7",  14},         // .
+        {"8",  15},         // .
+        {"9",  16},         // .
+        {"10", 17},         // "10"
 
-        {"item", 19},       // "Item is on" -> shelf (4) -> # (9-18) 
-                            // "Item is on" -> left/right (4/5)
-        {"aisle", 20},      // "Aisle"
-        {"shelf", 21},      // "Shelf"
+        {"item", 18},       // "Item is on" -> shelf (3) -> # (8-17) 
+                            // "Item is on" -> left/right (3/4)
+        {"aisle", 19},      // "Aisle"
+        {"shelf", 20},      // "Shelf"
     };
 
     int sleep_time_ms = 500;
