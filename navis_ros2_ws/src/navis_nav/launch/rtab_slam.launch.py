@@ -24,6 +24,8 @@ def generate_launch_description():
         'approx_sync_max_interval': 0.01,
         'use_sim_time': False,
 
+        'wait_imu_to_init': False,
+
         'subscribe_depth': False,
         'subscribe_rgbd': False,
         'subscribe_rgb': False,
@@ -33,7 +35,9 @@ def generate_launch_description():
         'Reg/Force3DoF': "True",
         'Grid/3D': "False",
         'RGBD/CreateOccupancyGrid': "True",
-        # Rtabmap/DatabasePath: "~/.ros/rtabmap.db" # if you see something about missing words in a dictionary, run 'rtabmap-recovery ~/.ros/rtabmap.db' to recover corrupted db
+        'Vis/CorType': "1", #better
+        # Rtabmap/DatabasePath: "~/.ros/rtabmap.db" # if you see something about missing words in a dictionary, 
+        #               run 'rtabmap-recovery ~/.ros/rtabmap.db' to recover corrupted db
         
         # Dont know if these actually do anything, but they were on performance recommendations in this tutorial: 
         # https://wiki.ros.org/rtabmap_ros/Tutorials/Advanced%20Parameter%20Tuning
@@ -105,7 +109,7 @@ def generate_launch_description():
             condition=IfCondition(LaunchConfiguration('localization'))
         ),
 
-                Node(
+        Node(
             package='rtabmap_slam',
             executable='rtabmap',
             name='rtabmap',

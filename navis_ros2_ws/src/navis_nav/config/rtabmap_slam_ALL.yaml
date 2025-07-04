@@ -1,3 +1,13 @@
+# Feature Identification TUning
+Vis/MaxFeatures: "2000"                  # [0 no limits.]
+Vis/MaxDepth: "10"                      # [Max depth of the features (0 means no limit).]
+Vis/RoiRatios: "0.0 0.0 0.0 0.0"        # [Region of interest ratios [left, right, top, bottom].]
+Vis/FeatureType: "8" #better            # [0=SURF 1=SIFT 2=ORB 3=FAST/FREAK 4=FAST/BRIEF 5=GFTT/FREAK 6=GFTT/BRIEF 7=BRISK 8=GFTT/ORB 9=KAZE 10=ORB-OCTREE 11=SuperPoint 12=SURF/FR>
+Vis/CorType: "1" #better
+
+
+
+
 BRIEF/Bytes: "32"                                  # [Bytes is a length of descriptor in bytes. It can be equal 16, 32 or 64 bytes.]
 BRISK/Octaves: "3"                                 # [Detection octaves. Use 0 to do single scale.]
 BRISK/PatternScale: "1"                            # [Apply this scale to the pattern used for sampling the neighbourhood of a keypoint.]
