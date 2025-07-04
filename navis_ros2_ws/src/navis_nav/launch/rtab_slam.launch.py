@@ -7,25 +7,43 @@ from launch_ros.actions import Node
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from ament_index_python.packages import get_package_share_directory
 from launch_ros.parameter_descriptions import ParameterFile
+from launch.conditions import IfCondition, UnlessCondition
 
 
 def generate_launch_description():
     stereo_pkg_dir = get_package_share_directory('stereo_cam')
     imu_pkg_dir = get_package_share_directory('mpu9250driver')
-    nav_pkg_dir = get_package_share_directory('navis_nav')
 
     ekf_config_path = os.path.join(stereo_pkg_dir, 'config', 'odom', 'ekf.yaml')
     mpu_imu_config_path = os.path.join(imu_pkg_dir, 'params', 'mpu_imu.yaml')
-    rtab_slam_config_path = os.path.join(nav_pkg_dir, 'config', 'rtabmap_slam.yaml')
 
     ekf_params  = ParameterFile(ekf_config_path)
     imu_params  = ParameterFile(mpu_imu_config_path)
-    rtab_params = ParameterFile(rtab_slam_config_path)
+    rtab_params = {
+        'approx_sync': True,
+        'approx_sync_max_interval': 0.01,
+        'use_sim_time': False,
 
-    localization = LaunchConfiguration('localization') == "true"
-    slam_mode_params = {
-        'Mem/IncrementalMemory':  "false" if localization else "true",
-        'Mem/InitWMWithAllNodes': "true" if localization else "false"
+        'subscribe_depth': False,
+        'subscribe_rgbd': False,
+        'subscribe_rgb': False,
+        'subscribe_stereo': True,
+        'subscribe_scan': False,
+
+        'Reg/Force3DoF': "True",
+        'Grid/3D': "False",
+        'RGBD/CreateOccupancyGrid': "True",
+        # Rtabmap/DatabasePath: "~/.ros/rtabmap.db" # if you see something about missing words in a dictionary, run 'rtabmap-recovery ~/.ros/rtabmap.db' to recover corrupted db
+        
+        # Dont know if these actually do anything, but they were on performance recommendations in this tutorial: 
+        # https://wiki.ros.org/rtabmap_ros/Tutorials/Advanced%20Parameter%20Tuning
+        'cloud_noise_filtering_radius': 0.05,
+        'cloud_noise_filtering_min_neighbors': 2, # Is this relevant for 2D?
+        'Optimizer/Slam2D': "True", # Can't find this in below param list, but in documentation as a recommended setting
+        
+        # Rtabmap/MaxRetrieved: 1
+        # Rtabmap/MaxLoopClosureDistance: 10.0
+        # Rtabmap/LoopThr: 0.11
     }
 
     return LaunchDescription([
@@ -75,13 +93,32 @@ def generate_launch_description():
             executable='rtabmap',
             name='rtabmap',
             output='screen',
-            parameters=[slam_mode_params,
+            parameters=[{
+                        'Mem/IncrementalMemory':  "false",
+                        'Mem/InitWMWithAllNodes': "true",
+                        },
                         rtab_params],
             remappings=[
-                ('/left/camera_info', '/left/camera_info_rect'),
-                ('/right/camera_info', '/right/camera_info_rect'),
-                ('odom', '/odom'),
+                ('odom', '/odometry/filtered'),
             ],
-            arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level')]
+            arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level')],
+            condition=IfCondition(LaunchConfiguration('localization'))
+        ),
+
+                Node(
+            package='rtabmap_slam',
+            executable='rtabmap',
+            name='rtabmap',
+            output='screen',
+            parameters=[{
+                        'Mem/IncrementalMemory':  "true",
+                        'Mem/InitWMWithAllNodes': "False",
+                        },
+                        rtab_params],
+            remappings=[
+                ('odom', '/odometry/filtered'),
+            ],
+            arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level')],
+            condition=UnlessCondition(LaunchConfiguration('localization'))
         )
     ])
