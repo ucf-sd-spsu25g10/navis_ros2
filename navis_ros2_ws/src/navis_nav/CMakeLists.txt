@@ -96,6 +96,7 @@ install(TARGETS
 # Install launch + headers
 install(DIRECTORY
   launch
+  config
   DESTINATION share/${PROJECT_NAME}/
 )
 

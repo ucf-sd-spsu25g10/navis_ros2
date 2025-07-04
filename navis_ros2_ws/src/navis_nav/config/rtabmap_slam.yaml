@@ -1,35 +1,31 @@
 rtabmap:
   ros__parameters:
-  
-    # Mapping Mode
-    Mem/IncrementalMemory: true
-    Mem/InitWMWithAllNodes: false
-    
+
     approx_sync: true
     approx_sync_max_interval: 0.01
     use_sim_time: false
-    
-    Grid/FromDepth: true
-    Grid/3D: false
-    RGBD/CreateOccupancyGrid: true
-    Rtabmap/DatabasePath: "/home/aden/rtab_maps/map.db"
-    
-    Reg/Force3DoF: true
-    RGBD/OptimizeMaxError: 3.0
-    Optimizer/Slam2D: true
-    
-    cloud_noise_filtering_radius: 0.05
-    cloud_noise_filtering_min_neighbors: 2
-    
-    Rtabmap/MaxRetrieved: 1
-    Rtabmap/MaxLoopClosureDistance: 10.0
-    Rtabmap/LoopThr: 0.11
-    
+
     subscribe_depth: false
     subscribe_rgbd: false
     subscribe_rgb: false
     subscribe_stereo: true
     subscribe_scan: false
+
+    Reg/Force3DoF: "True"
+    Grid/3D: "False"
+    RGBD/CreateOccupancyGrid: "True"
+    Rtabmap/DatabasePath: "~/rtab_maps/map.db"
+    
+    # Dont know if these actually do anything, but they were on performance recommendations in this tutorial: 
+    # https://wiki.ros.org/rtabmap_ros/Tutorials/Advanced%20Parameter%20Tuning
+    cloud_noise_filtering_radius: 0.05
+    cloud_noise_filtering_min_neighbors: 2 # Is this relevant for 2D?
+    Optimizer/Slam2D: "True" # Can't find this in below param list, but in documentation as a recommended setting
+    
+    # Rtabmap/MaxRetrieved: 1
+    # Rtabmap/MaxLoopClosureDistance: 10.0
+    # Rtabmap/LoopThr: 0.11
+    
 
 
 
