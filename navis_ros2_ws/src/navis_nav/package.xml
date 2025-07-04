@@ -21,6 +21,11 @@
   <depend>std_msgs</depend>
   <depend>visualization_msgs</depend>
   <depend>rosbag2_cpp</depend>
+  <depend>ros2_control</depend>
+  <depend>hardware_interface</depend>
+  <depend>controller_manager</depend>
+  <depend>gpio_controllers</depend>
+  <depend>robot_state_publisher</depend>
 
   <!-- Custom Message package -->
   <build_depend>navis_msgs</build_depend>

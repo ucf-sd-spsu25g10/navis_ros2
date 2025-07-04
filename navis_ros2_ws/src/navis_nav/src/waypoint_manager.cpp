@@ -7,10 +7,11 @@
 #include <vector>
 #include <chrono>
 #include <thread>
-
-#include <gpiod.h>
+#include <mutex>
+#include <condition_variable>
 
 #include "std_msgs/msg/bool.hpp"
+#include "std_msgs/msg/float64.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "navis_msgs/msg/waypoints_list.hpp"
 #include "navis_msgs/msg/control_out.hpp"
@@ -23,7 +24,7 @@ public:
 
     WaypointManager() : Node("waypoint_manager")
     {
-        RCLCPP_INFO(this->get_logger(), "Talker C++ node has been created");
+        RCLCPP_INFO(this->get_logger(), "WaypointManager node has been created");
 
         waypoint_publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("rtabmap/goal", 10);
         speaker_publisher_ = this->create_publisher<navis_msgs::msg::ControlOut>("control_output", 10);
@@ -31,23 +32,26 @@ public:
         goal_reached_subscriber_ = this->create_subscription<std_msgs::msg::Bool>(
             "rtabmap/goal_reached",
             rclcpp::QoS(10),
-            std::bind(&WaypointManager::goal_reached_callback, this, std::placeholders::_1)
+            std::bind(&WaypointManager::ros_goal_reached_callback, this, std::placeholders::_1)
+        );
+
+        button_subscriber_ = this->create_subscription<std_msgs::msg::Float64>(
+            "/gpio_controller/state",
+            rclcpp::QoS(10),
+            std::bind(&WaypointManager::button_callback, this, std::placeholders::_1)
         );
 
         cur_waypoint_idx = 0;
         number_of_waypoints = 0;
 
-        // Starting thread for GPIO button press
-        while(rclcpp::ok() && keep_running_) {
-            gpio_thread_ = std::thread(&WaypointManager::gpio_interrupt_loop, this);
-        }
-
         get_list();
+        RCLCPP_INFO(this->get_logger(), "Waiting for button press to start...");
     }
 
 private:
 
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr goal_reached_subscriber_;
+    rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr button_subscriber_;
 
     rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr waypoint_publisher_;
     rclcpp::Publisher<navis_msgs::msg::ControlOut>::SharedPtr speaker_publisher_;
@@ -57,8 +61,9 @@ private:
 
     WaypointOrderer waypoint_orderer;
 
-    std::thread gpio_thread_;
-    std::atomic<bool> keep_running_{true};
+    std::mutex goal_mutex_;
+    std::condition_variable cv_;
+    bool button_pressed_ = false;
 
     std::unordered_map<std::string, int> wav_map = {
         {"first", 0},       // "With assistance, please navigate to" -> aisle (19) -> number (8-17)
@@ -128,58 +133,49 @@ private:
         waypoint_list = waypoint_orderer.order_list();
         number_of_waypoints = waypoint_list.size();
         RCLCPP_INFO(this->get_logger(), "Ordered waypoint list received, beginning navigation");
-
-        // TODO Indiciating to ensure we are at the start location
     }
 
-void gpio_interrupt_loop() {
-    const char* chipname = "gpiochip0";
-    const unsigned int pin_num = 17; // TODO CHANGE ME
+    void button_callback(const std_msgs::msg::Float64::SharedPtr msg) {
+        if (msg->data > 0.5) { // Button is pressed
+            bool start_now = false;
+            {
+                std::lock_guard<std::mutex> lock(goal_mutex_);
+                if (cur_waypoint_idx > 0) {
+                    RCLCPP_INFO(this->get_logger(), "Button pressed, continuing navigation.");
+                    button_pressed_ = true;
+                    cv_.notify_one();
+                } else {
+                    RCLCPP_INFO(this->get_logger(), "Button pressed, starting navigation.");
+                    start_now = true;
+                }
+            }
 
-    gpiod_chip* chip = gpiod_chip_open_by_name(chipname);
-    if (!chip) {
-        RCLCPP_ERROR(this->get_logger(), "Failed to open GPIO chip");
-        return;
-    }
-
-    gpiod_line* pin = gpiod_chip_get_line(chip, pin_num);
-    if (!pin) {
-        RCLCPP_ERROR(this->get_logger(), "Failed to get GPIO line");
-        gpiod_chip_close(chip);
-        return;
-    }
-
-    if (gpiod_line_request_rising_edge_events(pin, "ros2_button") < 0) {
-        RCLCPP_ERROR(this->get_logger(), "Failed to request events on GPIO line");
-        gpiod_chip_close(chip);
-        return;
-    }
-
-    RCLCPP_INFO(this->get_logger(), "Waiting for button press...");
-
-    while (rclcpp::ok() && keep_running_) {
-        struct gpiod_line_event event;
-        int ret = gpiod_line_event_wait(pin, nullptr);
-
-        if (ret < 0) {
-            RCLCPP_ERROR(this->get_logger(), "Error waiting for GPIO event");
-            break;
-        } else if (ret == 0) {
-            continue;
-        }
-
-        if (gpiod_line_event_read(pin, &event) == 0) {
-            auto msg = std_msgs::msg::Bool();
-            msg.data = true;
-            goal_reached_callback(msg);
+            if (start_now) {
+                auto bool_msg = std::make_shared<std_msgs::msg::Bool>();
+                bool_msg->data = true;
+                process_waypoint_logic(bool_msg);
+            }
         }
     }
 
-    gpiod_line_release(pin);
-    gpiod_chip_close(chip);
-}
+    void ros_goal_reached_callback(const std_msgs::msg::Bool::SharedPtr msg) {
+        if (msg->data) {
+            RCLCPP_INFO(this->get_logger(), "Waypoint reached. Waiting for button press to get next item.");
 
-    void goal_reached_callback(const std_msgs::msg::Bool::SharedPtr msg) {
+            std::unique_lock<std::mutex> lock(goal_mutex_);
+            button_pressed_ = false; // Reset before waiting
+            cv_.wait(lock, [this]{ return button_pressed_; });
+            lock.unlock();
+
+            // Debounce
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+
+            process_waypoint_logic(msg);
+        }
+    }
+
+    void process_waypoint_logic(const std_msgs::msg::Bool::SharedPtr msg) {
+        std::lock_guard<std::mutex> lock(goal_mutex_);
         
         if (msg->data) {
 
@@ -187,10 +183,12 @@ void gpio_interrupt_loop() {
             control_msg.buzzer_strength = 0;
             std::string cur_waypoint_str = waypoint_list[cur_waypoint_idx];
 
-            RCLCPP_INFO(this->get_logger(), "Waypoint %d Reached", cur_waypoint_idx);
+            RCLCPP_INFO(this->get_logger(), "Processing Waypoint %d", cur_waypoint_idx);
 
             // Spin til we have grocery list
-            while (number_of_waypoints == 0) {}
+            while (number_of_waypoints == 0) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
 
             // First Waypoint
             if (cur_waypoint_idx == 0) {
@@ -323,9 +321,7 @@ int main(int argc, char ** argv)
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<WaypointManager>());
   rclcpp::shutdown();
-  keep_running_ = false;
-  if(gpio_thread_.joinable()) {
-    gpio_thread_.join();
-  }
   return 0;
 }
+
+

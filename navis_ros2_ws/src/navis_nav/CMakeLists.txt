@@ -16,6 +16,11 @@ find_package(visualization_msgs REQUIRED)
 find_package(navis_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(rosbag2_cpp REQUIRED)
+find_package(ros2_control REQUIRED)
+find_package(hardware_interface REQUIRED)
+find_package(controller_manager REQUIRED)
+find_package(gpio_controllers REQUIRED)
+find_package(robot_state_publisher REQUIRED)
 
 # Include paths
 include_directories(include)
@@ -54,6 +59,10 @@ ament_target_dependencies(waypoint_manager
   std_msgs
   geometry_msgs
   navis_msgs
+  ros2_control
+  hardware_interface
+  controller_manager
+  gpio_controllers
 )
 
 ament_target_dependencies(control_out_node 

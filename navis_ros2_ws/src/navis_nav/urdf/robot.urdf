@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<robot name="navis_robot">
+    <ros2_control name="ros2_control" type="system">
+        <hardware>
+            <plugin>gpio_controllers/Gpios</plugin>
+            <param name="gpio_chip_name">gpiochip0</param>
+        </hardware>
+        <gpio name="button">
+            <command_interface name="value"/>
+            <state_interface name="value"/>
+            <param name="pin">17</param>
+            <param name="direction">in</param>
+        </gpio>
+    </ros2_control>
+</robot>
