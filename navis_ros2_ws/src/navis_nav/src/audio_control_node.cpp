@@ -87,8 +87,9 @@ private:
 
         auto control_msg = navis_msgs::msg::ControlOut();
         control_msg.buzzer_strength = 0; // Not used for audio
+        const auto& wav_map = get_wav_map();
         if (wav_map.count(cue)) {
-            control_msg.speaker_wav_index = wav_map[cue];
+            control_msg.speaker_wav_index = wav_map.at(cue);
             control_pub_->publish(control_msg);
             RCLCPP_INFO(this->get_logger(), "Published audio cue: %s", cue.c_str());
             last_cue_ = cue;
