@@ -93,12 +93,10 @@ private:
         speaker_publisher_->publish(control_msg);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-        const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at(std::to_string(distance_to_next));
         speaker_publisher_->publish(control_msg);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-        const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at("meters");
         speaker_publisher_->publish(control_msg);
 
@@ -171,24 +169,20 @@ private:
             if (cur_waypoint_idx == 0) {
                 RCLCPP_INFO(this->get_logger(), "First Waypoint Reached, Indicating to navigate to aisle %d with assistance", store_map[waypoint_list[cur_waypoint_idx+1]].aisle);
                 
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at("first");
                 speaker_publisher_->publish(control_msg);
             
                 std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at("aisle");
                 speaker_publisher_->publish(control_msg);
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at(std::to_string(store_map[cur_waypoint_str].aisle));
                 speaker_publisher_->publish(control_msg);
             }
 
             // Final Waypoint
             else if (cur_waypoint_idx + 1 == number_of_waypoints) {
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at("final");
                 speaker_publisher_->publish(control_msg);
                 RCLCPP_INFO(this->get_logger(), "Final Waypoint Reached, %s", cur_waypoint_str.c_str());
@@ -204,32 +198,26 @@ private:
                             : !store_map[cur_waypoint_str].side_of_aisle;
                 std::string l_r_str = (l_r) ? "left" : "right";
 
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at("item");
                 speaker_publisher_->publish(control_msg);
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at(l_r_str);
                 speaker_publisher_->publish(control_msg);
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at("shelf");
                 speaker_publisher_->publish(control_msg);
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at(std::to_string(store_map[cur_waypoint_str].shelf_height));
                 speaker_publisher_->publish(control_msg);
                 
                 std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at("turn");
                 speaker_publisher_->publish(control_msg);
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at("around");
                 speaker_publisher_->publish(control_msg);
                 
@@ -248,22 +236,18 @@ private:
                             : !store_map[cur_waypoint_str].side_of_aisle;
                 std::string l_r_str = (l_r) ? "left" : "right";
 
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at("item");
                 speaker_publisher_->publish(control_msg);
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at(l_r_str);
                 speaker_publisher_->publish(control_msg);
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at("shelf");
                 speaker_publisher_->publish(control_msg);
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at(std::to_string(store_map[cur_waypoint_str].shelf_height));
                 speaker_publisher_->publish(control_msg);
                 
@@ -278,12 +262,10 @@ private:
                 std::string l_r = (cur_waypoint_str.find("bottom") != std::string::npos) ? "left" : "right";
                 RCLCPP_INFO(this->get_logger(), "End of Aisle %s Reached, Indicating turn %s", cur_waypoint_str.c_str(), l_r.c_str());
                 
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at("turn");
                 speaker_publisher_->publish(control_msg);
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-                const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at(l_r);
                 speaker_publisher_->publish(control_msg);
                 
