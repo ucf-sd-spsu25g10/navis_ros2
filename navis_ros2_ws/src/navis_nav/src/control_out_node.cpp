@@ -64,9 +64,10 @@ private:
     void write_uart(int val) {
         if (uart_fd_ < 0) return;
 
-        uint8_t packet = static_cast<uint8_t>(val);
+        char packet[5];
+        snprintf(packet, sizeof(packet), "h%d", val);
 
-        write(uart_fd_, &packet, sizeof(packet));
+        write(uart_fd_, packet, strlen(packet));
     }
 
     void write_callback(const navis_msgs::msg::ControlOut::SharedPtr msg) {

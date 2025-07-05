@@ -114,3 +114,11 @@ if(BUILD_TESTING)
 endif()
 
 ament_package()
+
+add_executable(haptic_control_node src/haptic_control_node.cpp)
+ament_target_dependencies(haptic_control_node rclcpp geometry_msgs navis_msgs nav_msgs tf2)
+
+install(TARGETS
+  haptic_control_node
+  DESTINATION lib/${PROJECT_NAME}
+)
