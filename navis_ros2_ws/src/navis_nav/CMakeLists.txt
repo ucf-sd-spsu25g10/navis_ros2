@@ -122,3 +122,11 @@ install(TARGETS
   haptic_control_node
   DESTINATION lib/${PROJECT_NAME}
 )
+
+add_executable(audio_control_node src/audio_control_node.cpp)
+ament_target_dependencies(audio_control_node rclcpp nav_msgs geometry_msgs navis_msgs tf2)
+
+install(TARGETS
+  audio_control_node
+  DESTINATION lib/${PROJECT_NAME}
+)
