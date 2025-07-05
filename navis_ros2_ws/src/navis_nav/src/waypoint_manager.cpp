@@ -69,6 +69,8 @@ private:
 
     int sleep_time_ms = 500;
 
+    const auto& wav_map = get_wav_map();
+
     // true = x, false = y
     void add_go_straight_cmd(bool x_or_y) {
         navis_msgs::msg::ControlOut control_msg;
@@ -88,7 +90,6 @@ private:
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-        const auto& wav_map = get_wav_map();
         control_msg.speaker_wav_index = wav_map.at("straight");
         speaker_publisher_->publish(control_msg);
 
