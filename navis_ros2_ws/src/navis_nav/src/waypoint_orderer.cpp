@@ -54,14 +54,14 @@ void WaypointOrderer::get_unordered_list() {
                             return s.find("aisle" + std::to_string(temp_aisle)) != std::string::npos;
                           });
 
-      if (temp_aisle != cur_aisle && !exists) {
-        grocery_list.insert(grocery_list.begin() + i, "aisle" + std::to_string(temp_aisle) + "_top");
-        ++i;
+      // if (temp_aisle != cur_aisle && !exists) {
+      //   grocery_list.insert(grocery_list.begin() + i, "aisle" + std::to_string(temp_aisle) + "_top");
+      //   ++i;
 
-        grocery_list.insert(grocery_list.begin() + i, "aisle" + std::to_string(temp_aisle) + "_bottom");
-        ++i;
-        cur_aisle = temp_aisle;
-      }
+      //   grocery_list.insert(grocery_list.begin() + i, "aisle" + std::to_string(temp_aisle) + "_bottom");
+      //   ++i;
+      //   cur_aisle = temp_aisle;
+      // }
     }
 
     print_cur_list("preset list");

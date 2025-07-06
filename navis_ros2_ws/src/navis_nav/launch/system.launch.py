@@ -17,16 +17,36 @@ def generate_launch_description():
 
     navis_nav_path = get_package_share_directory('navis_nav')
 
-    robot_description = Command(["xacro ", os.path.join(navis_nav_path, "urdf", "robot.urdf")])
-
-    robot_state_publisher = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        name="robot_state_publisher",
-        output="screen",
-        parameters=[{"robot_description": robot_description}],
+    # 1. High-Level Waypoint Management
+    waypoint_orderer = Node(
+        package='navis_nav',
+        executable='waypoint_orderer',
+        name='waypoint_orderer'
     )
 
+    waypoint_manager = Node(
+        package='navis_nav',
+        executable='waypoint_manager',
+        name='waypoint_manager'
+    )
+
+    # 2. Mid-Level Stereo-SLAM stack
+    slam = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                navis_nav_path,
+                'launch',
+                'rtab_slam_stereo.launch.py'
+            )
+        ),
+        launch_arguments={
+            'use_raspi': use_raspi,
+            'rviz': rviz,
+            'rtabmap_rviz': rtabmap_rviz,
+        }.items()
+    )
+
+    # 3. Low-Level Planning, Control, and Hardware Interfacing Nodes
     controller_manager = Node(
         package="controller_manager",
         executable="ros2_control_node",
@@ -41,31 +61,14 @@ def generate_launch_description():
         output="screen",
     )
 
-    waypoint_orderer = Node(
+    control_out_node = Node(
         package='navis_nav',
-        executable='waypoint_orderer',
-        name='waypoint_orderer'
+        executable='control_out_node',
     )
 
-    waypoint_manager = Node(
+    control_action_calc = Node(
         package='navis_nav',
-        executable='waypoint_manager',
-        name='waypoint_manager'
-    )
-
-    slam = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('navis_nav'),
-                'launch',
-                'depth_rtab_localize.launch.py'
-            )
-        ),
-        launch_arguments={
-            'use_raspi': use_raspi,
-            'rviz': rviz,
-            'rtabmap_rviz': rtabmap_rviz,
-        }.items()
+        executable='control_action_calc'
     )
 
     # Delay node_b until node_a exits
@@ -84,10 +87,11 @@ def generate_launch_description():
         DeclareLaunchArgument('localization', default_value='false', description='Launch in localization mode.'),
         DeclareLaunchArgument('use_raspi', default_value='false', description='Use Raspberry Pi config if true, laptop config otherwise' ),
 
-        robot_state_publisher,
         controller_manager,
         spawn_gpio_controller,
         waypoint_orderer,
         waypoint_manager,
+        control_out_node,
+        control_action_calc,
         system_delay
     ])

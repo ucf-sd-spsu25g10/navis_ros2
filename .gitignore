@@ -119,6 +119,9 @@ navis_ros2_ws/left_right_image/*
 navis_ros2_ws/temp_img/*
 navis_ros2_ws/temp_img/.gitkeep
 
+navis_ros2_ws/maps/*
+!navis_ros2_ws/maps/.gitkeep
+
 navis_ros2_ws/temp_lr_image/
 
 navis_ros2_ws/src/navis_nav/bags/*

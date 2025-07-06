@@ -11,7 +11,7 @@ public:
     ControlOutNode() : Node("control_out_node") {
         
         control_out_sub_ = this->create_subscription<navis_msgs::msg::ControlOut>(
-            "control_output",
+            "/control_output",
             rclcpp::QoS(10),
             std::bind(&ControlOutNode::write_callback, this, std::placeholders::_1)
         );
