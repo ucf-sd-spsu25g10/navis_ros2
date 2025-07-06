@@ -76,6 +76,8 @@ ament_target_dependencies(control_action_calc
   rclcpp_components
   nav_msgs
   navis_msgs
+  geometry_msgs
+  tf2
 )
 
 ament_target_dependencies(bag_recorder
@@ -114,19 +116,3 @@ if(BUILD_TESTING)
 endif()
 
 ament_package()
-
-add_executable(haptic_control_node src/haptic_control_node.cpp)
-ament_target_dependencies(haptic_control_node rclcpp geometry_msgs navis_msgs nav_msgs tf2)
-
-install(TARGETS
-  haptic_control_node
-  DESTINATION lib/${PROJECT_NAME}
-)
-
-add_executable(audio_control_node src/audio_control_node.cpp)
-ament_target_dependencies(audio_control_node rclcpp nav_msgs geometry_msgs navis_msgs tf2)
-
-install(TARGETS
-  audio_control_node
-  DESTINATION lib/${PROJECT_NAME}
-)
