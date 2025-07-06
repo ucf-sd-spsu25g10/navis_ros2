@@ -76,6 +76,8 @@ ament_target_dependencies(control_action_calc
   rclcpp_components
   nav_msgs
   navis_msgs
+  geometry_msgs
+  tf2
 )
 
 ament_target_dependencies(bag_recorder

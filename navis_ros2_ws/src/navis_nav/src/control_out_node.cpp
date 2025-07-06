@@ -61,18 +61,31 @@ private:
         }
     }
 
-    void write_uart(int val) {
-        if (uart_fd_ < 0) return;
-
-        uint8_t packet = static_cast<uint8_t>(val);
-
-        write(uart_fd_, &packet, sizeof(packet));
+    void write_uart(const char* packet) {
+        if (uart_fd_ < 0) {
+            RCLCPP_WARN_ONCE(this->get_logger(), "UART not available. Is it open?");
+            return;
+        }
+        // Add a newline to delimit commands for the receiver
+        char buffer[32];
+        int len = snprintf(buffer, sizeof(buffer), "%s\n", packet);
+        if (write(uart_fd_, buffer, len) < 0) {
+            RCLCPP_WARN(this->get_logger(), "Failed to write to UART");
+        }
     }
 
     void write_callback(const navis_msgs::msg::ControlOut::SharedPtr msg) {
-        int direction = msg->buzzer_strength;
+        // Haptic feedback command is always sent
+        char haptic_packet[8]; // e.g., "h-255"
+        snprintf(haptic_packet, sizeof(haptic_packet), "h%d", msg->buzzer_strength);
+        write_uart(haptic_packet);
 
-        write_uart(direction);
+        // Audio feedback command, only if there is a cue
+        if (msg->speaker_wav_index > 0) {
+            char audio_packet[6]; // e.g., "a255"
+            snprintf(audio_packet, sizeof(audio_packet), "a%d", msg->speaker_wav_index);
+            write_uart(audio_packet);
+        }
     }
 
     // Topic Subscription
