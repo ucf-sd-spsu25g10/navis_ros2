@@ -47,6 +47,7 @@ GTSAM/IncRelinearizeSkip: "1"                      # [Only relinearize any varia
 GTSAM/IncRelinearizeThreshold: "0.01"              # [Only relinearize variables whose linear delta magnitude is greater than this threshold. See GTSAM::ISAM2 doc for more info.]
 GTSAM/Incremental: "false"                         # [Do graph optimization incrementally (iSAM2) to increase optimization speed on loop closures. Note that only GaussNewton and Dogleg optimization algorithms are supported (GTSAM/Optimizer) in this mode.]
 GTSAM/Optimizer: "1"                               # [0=Levenberg 1=GaussNewton 2=Dogleg]
+
 Grid/3D: "true"                                    # [A 3D occupancy grid is required if you want an OctoMap (3D ray tracing). Set to false if you want only a 2D map, the cloud will be projected on xy plane. A 2D map can be still generated if checked, but it requires more memory and time to generate it. Ignored if laser scan is 2D and "Grid/Sensor" is 0.]
 Grid/CellSize: "0.05"                              # [Resolution of the occupancy grid.]
 Grid/ClusterRadius: "0.1"                          # [[Grid/NormalsSegmentation=true] Cluster maximum radius.]
@@ -74,6 +75,7 @@ Grid/RayTracing: "false"                           # [Ray tracing is done for ea
 Grid/Scan2dUnknownSpaceFilled: "false"             # [Unknown space filled. Only used with 2D laser scans. Use Grid/RangeMax to set maximum range if laser scan max range is to set.]
 Grid/ScanDecimation: "1"                           # [[Grid/Sensor=0 or 2] Decimation of the laser scan before creating cloud.]
 Grid/Sensor: "1"                                   # [Create occupancy grid from selected sensor: 0=laser scan, 1=depth image(s) or 2=both laser scan and depth image(s).]
+
 GridGlobal/AltitudeDelta: "0"                      # [Assemble only nodes that have the same altitude of +-delta meters of the current pose (0=disabled). This is used to generate 2D occupancy grid based on the current altitude (e.g., multi-floor building).]
 GridGlobal/Eroded: "false"                         # [Erode obstacle cells.]
 GridGlobal/FloodFillDepth: "0"                     # [Flood fill filter (0=disabled), used to remove empty cells outside the map. The flood fill is done at the specified depth (between 1 and 16) of the OctoMap.]
@@ -86,6 +88,7 @@ GridGlobal/ProbClampingMin: "0.1192"               # [Probability clamping minim
 GridGlobal/ProbHit: "0.7"                          # [Probability of a hit (value between 0.5 and 1).]
 GridGlobal/ProbMiss: "0.4"                         # [Probability of a miss (value between 0 and 0.5).]
 GridGlobal/UpdateError: "0.01"                     # [Graph changed detection error (m). Update map only if poses in new optimized graph have moved more than this value.]
+
 Icp/CCFilterOutFarthestPoints: "false"             # [If true, the algorithm will automatically ignore farthest points from the reference, for better convergence.]
 Icp/CCMaxFinalRMS: "0.2"                           # [Maximum final RMS error.]
 Icp/CCSamplingLimit: "50000"                       # [Maximum number of points per cloud (they are randomly resampled below this limit otherwise).]

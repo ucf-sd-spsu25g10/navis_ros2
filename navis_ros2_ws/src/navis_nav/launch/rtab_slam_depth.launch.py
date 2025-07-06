@@ -43,11 +43,13 @@ def generate_launch_description():
         # https://wiki.ros.org/rtabmap_ros/Tutorials/Advanced%20Parameter%20Tuning
         'cloud_noise_filtering_radius': 0.05,
         'cloud_noise_filtering_min_neighbors': 2, # Is this relevant for 2D?
-        'Optimizer/Slam2D': "True", # Can't find this in below param list, but in documentation as a recommended setting
+        'Optimizer/Slam2D': "True", # Can't find this in below param list, but its in documentation as a recommended setting
         
-        # Rtabmap/MaxRetrieved: 1
-        # Rtabmap/MaxLoopClosureDistance: 10.0
-        # Rtabmap/LoopThr: 0.11
+        "Grid/RayTracing": "True",
+        "Grid/NormalsSegmentation": "False",
+        "Grid/NoiseFilteringRadius": "0.0",
+        "Grid/RangeMax": "4.0",
+        "Grid/MinClusterSize": "20"
     }
 
     return LaunchDescription([
@@ -122,7 +124,7 @@ def generate_launch_description():
             remappings=[
                 ('odom', '/odometry/filtered'),
             ],
-            arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level')],
+            arguments=['-d', '--ros-args', '--log-level', LaunchConfiguration('log_level')],
             condition=UnlessCondition(LaunchConfiguration('localization'))
         )
     ])
