@@ -6,6 +6,6 @@
 	path = navis_ros2_ws/src/ros2_mpu9250_driver
 	url = git@github.com:adenm-10/navis_mpu9250_driver.git
 
-# [submodule "navis_ros2_ws/src/ros2_bmi323_driver"]
-# 	path = navis_ros2_ws/src/ros2_bmi323_driver
-# 	url = git@github.com:adenm-10/ros2_bmi323_driver.git
+[submodule "navis_ros2_ws/src/bno08x_ros2_driver"]
+	path = navis_ros2_ws/src/bno08x_ros2_driver
+	url = git@github.com:adenm-10/bno08x_ros2_driver.git
