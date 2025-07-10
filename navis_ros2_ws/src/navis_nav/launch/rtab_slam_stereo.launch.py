@@ -1,14 +1,13 @@
 import os
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, OpaqueFunction, IncludeLaunchDescription
-from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from ament_index_python.packages import get_package_share_directory
 from launch_ros.parameter_descriptions import ParameterFile
 from launch.conditions import IfCondition, UnlessCondition
-
 
 def generate_launch_description():
 
@@ -62,26 +61,29 @@ def generate_launch_description():
         DeclareLaunchArgument('use_sim_time', default_value='false'),
         DeclareLaunchArgument('log_level', default_value='WARN'),
         DeclareLaunchArgument('use_raspi', default_value='false'),
+        DeclareLaunchArgument('use_bno', default_value='true'),
 
         # IMU driver 
-        # Node(
-        #     package='mpu9250driver',
-        #     executable='mpu9250driver',
-        #     name='mpu9250driver_node',
-        #     output='screen',
-        #     respawn=True,
-        #     respawn_delay=4,
-        #     emulate_tty=True,
-        #     parameters=[mpu_imu_params],
-        #     arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level')]
-        # ),
+        Node(
+            package='mpu9250driver',
+            executable='mpu9250driver',
+            name='mpu9250driver_node',
+            output='screen',
+            respawn=True,
+            respawn_delay=4,
+            emulate_tty=True,
+            parameters=[mpu_imu_params],
+            arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level')],
+            condition=UnlessCondition(LaunchConfiguration('use_bno'))
+        ),
 
         Node(
             package='bno08x_ros2_driver',  
             executable='bno08x_driver',  
             name='bno08x_driver',
             output='screen',
-            parameters=[bno_imu_params]
+            parameters=[bno_imu_params],
+            condition=IfCondition(LaunchConfiguration('use_bno'))
         ),
 
         # Stereo camera pipeline
