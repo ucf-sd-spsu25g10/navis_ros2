@@ -11,14 +11,19 @@ from launch.conditions import IfCondition, UnlessCondition
 
 
 def generate_launch_description():
+
     stereo_pkg_dir = get_package_share_directory('stereo_cam')
-    imu_pkg_dir = get_package_share_directory('mpu9250driver')
-
     ekf_config_path = os.path.join(stereo_pkg_dir, 'config', 'odom', 'ekf.yaml')
-    mpu_imu_config_path = os.path.join(imu_pkg_dir, 'params', 'mpu_imu.yaml')
-
     ekf_params  = ParameterFile(ekf_config_path)
-    imu_params  = ParameterFile(mpu_imu_config_path)
+
+    bno_pkg_dir = get_package_share_directory('bno08x_ros2_driver'),
+    bno_imu_config_path = os.path.join(bno_pkg_dir, 'config', 'bno085_i2c.yaml')
+    bno_imu_params = ParameterFile(bno_imu_config_path)
+
+    mpu_pkg_dir = get_package_share_directory('mpu9250driver')
+    mpu_imu_config_path = os.path.join(mpu_pkg_dir, 'params', 'mpu_imu.yaml')
+    mpu_imu_params  = ParameterFile(mpu_imu_config_path)
+
     rtab_params = {
         'approx_sync': True,
         'approx_sync_max_interval': 0.01,
@@ -59,16 +64,24 @@ def generate_launch_description():
         DeclareLaunchArgument('use_raspi', default_value='false'),
 
         # IMU driver 
+        # Node(
+        #     package='mpu9250driver',
+        #     executable='mpu9250driver',
+        #     name='mpu9250driver_node',
+        #     output='screen',
+        #     respawn=True,
+        #     respawn_delay=4,
+        #     emulate_tty=True,
+        #     parameters=[mpu_imu_params],
+        #     arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level')]
+        # ),
+
         Node(
-            package='mpu9250driver',
-            executable='mpu9250driver',
-            name='mpu9250driver_node',
+            package='bno08x_ros2_driver',  
+            executable='bno08x_driver',  
+            name='bno08x_driver',
             output='screen',
-            respawn=True,
-            respawn_delay=4,
-            emulate_tty=True,
-            parameters=[imu_params],
-            arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level')]
+            parameters=[bno_imu_params]
         ),
 
         # Stereo camera pipeline
