@@ -35,11 +35,11 @@ public:
             std::bind(&WaypointManager::ros_goal_reached_callback, this, std::placeholders::_1)
         );
 
-        button_subscriber_ = this->create_subscription<std_msgs::msg::Float64>(
-            "/gpio_controller/state",
-            rclcpp::QoS(10),
-            std::bind(&WaypointManager::button_callback, this, std::placeholders::_1)
-        );
+        // button_subscriber_ = this->create_subscription<std_msgs::msg::Float64>(
+        //     "/gpio_controller/state",
+        //     rclcpp::QoS(10),
+        //     std::bind(&WaypointManager::button_callback, this, std::placeholders::_1)
+        // );
 
         cur_waypoint_idx = 0;
         number_of_waypoints = 0;
@@ -108,8 +108,11 @@ private:
         waypoint_orderer.get_unordered_list();
         waypoint_list = waypoint_orderer.order_list();
         number_of_waypoints = waypoint_list.size();
-        RCLCPP_INFO(this->get_logger(), "Ordered waypoint list received, beginning navigation");
-        process_waypoint_logic(msg);
+        RCLCPP_INFO(this->get_logger(), "Ordered waypoint list received, beginning navigation to starting point. %d total waypoints", number_of_waypoints);
+        
+        auto bool_msg = std::make_shared<std_msgs::msg::Bool>();
+        bool_msg->data = true;
+        process_waypoint_logic(bool_msg);
     }
 
     // void button_callback(const std_msgs::msg::Float64::SharedPtr msg) {
@@ -163,7 +166,7 @@ private:
 
             // First Waypoint
             if (cur_waypoint_idx == 0) {
-                RCLCPP_INFO(this->get_logger(), "Navigating to starting point", store_map[waypoint_list[cur_waypoint_idx+1]].aisle);
+                RCLCPP_INFO(this->get_logger(), "Navigating to starting point", store_map[cur_waypoint_str].aisle);
                 
                 control_msg.speaker_wav_index = wav_map_.at("first");
                 speaker_publisher_->publish(control_msg);
@@ -217,7 +220,7 @@ private:
                 control_msg.speaker_wav_index = wav_map_.at("around");
                 speaker_publisher_->publish(control_msg);
                 
-                add_go_straight_cmd(false);
+                // add_go_straight_cmd(false);
                 
                 RCLCPP_INFO(this->get_logger(), "Final Item %s Reached, Indicating shelf %d, Indicating on side %s, Indicating turn around", cur_waypoint_str.c_str(), store_map[cur_waypoint_str].shelf_height, l_r_str.c_str());
             }
@@ -249,7 +252,7 @@ private:
                 
                 RCLCPP_INFO(this->get_logger(), "Item %s Reached, Indicating shelf %d, Indicating on side %s", cur_waypoint_str.c_str(), store_map[cur_waypoint_str].shelf_height, l_r_str.c_str());
 
-                add_go_straight_cmd(false);
+                // add_go_straight_cmd(false);
 
             }
 

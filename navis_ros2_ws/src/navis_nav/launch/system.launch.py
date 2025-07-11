@@ -15,12 +15,6 @@ def generate_launch_description():
     navis_nav_path = get_package_share_directory('navis_nav')
 
     # 1. High-Level Waypoint Management
-    waypoint_orderer = Node(
-        package='navis_nav',
-        executable='waypoint_orderer',
-        name='waypoint_orderer'
-    )
-
     waypoint_manager = Node(
         package='navis_nav',
         executable='waypoint_manager',
@@ -51,12 +45,12 @@ def generate_launch_description():
         output="screen",
     )
 
-    spawn_gpio_controller = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["gpio_controller"],
-        output="screen",
-    )
+    # spawn_gpio_controller = Node(
+    #     package="controller_manager",
+    #     executable="spawner",
+    #     arguments=["gpio_controller"],
+    #     output="screen",
+    # )
 
     # control_out_node = Node(
     #     package='navis_nav',
@@ -82,10 +76,10 @@ def generate_launch_description():
         DeclareLaunchArgument('rviz',         default_value='false', description='Launch RVIZ (optional).'),
         DeclareLaunchArgument('use_raspi',    default_value='true', description='Use Raspberry Pi config if true, laptop config otherwise' ),
 
-        controller_manager,
-        spawn_gpio_controller,
-        waypoint_orderer,
         waypoint_manager,
+        slam,
+        controller_manager,
+        # spawn_gpio_controller,
         # control_out_node,
         control_action_calc,
         # system_delay
