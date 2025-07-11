@@ -107,6 +107,11 @@ private:
     void get_list() {
         // waypoint_orderer.get_unordered_list();
         waypoint_list = waypoint_orderer.order_list();
+
+        for (std::string& str : grocery_list) {
+            std::cout << str << ", " << store_map[str].aisle << ", " << store_map[str].disc_y << std::endl;
+        }
+
         number_of_waypoints = waypoint_list.size();
         RCLCPP_INFO(this->get_logger(), "Ordered waypoint list received, beginning navigation to starting point. %d total waypoints", number_of_waypoints);
         
@@ -141,7 +146,7 @@ private:
             // lock.unlock();
 
             // Debounce
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            // std::this_thread::sleep_for(std::chrono::seconds(1));
 
             RCLCPP_INFO(this->get_logger(), "Waypoint reached. Navigating to next waypoint.");
             process_waypoint_logic(msg);
@@ -173,12 +178,12 @@ private:
             if (cur_waypoint_idx == -1) {
                 RCLCPP_INFO(this->get_logger(), "Navigating to starting point");
                 
-                control_msg.speaker_wav_index = wav_map_.at("first");
-                speaker_publisher_->publish(control_msg);
+                // control_msg.speaker_wav_index = wav_map_.at("first");
+                // speaker_publisher_->publish(control_msg);
             
-                std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-                control_msg.speaker_wav_index = wav_map_.at("aisle");
-                speaker_publisher_->publish(control_msg);
+                // std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+                // control_msg.speaker_wav_index = wav_map_.at("aisle");
+                // speaker_publisher_->publish(control_msg);
 
                 // std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
                 // control_msg.speaker_wav_index = wav_map_.at(std::to_string(store_map[cur_waypoint_str].aisle));
