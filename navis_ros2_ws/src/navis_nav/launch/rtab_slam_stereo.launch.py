@@ -115,8 +115,8 @@ def generate_launch_description():
             parameters=[{
                         'Mem/IncrementalMemory': "false",
                         'Mem/InitWMWithAllNodes': "true",
-                        "Rtabmap/DatabasePath": "~/.ros/rtabmap_lib_floor2.db" # if you see something about missing words in a dictionary, 
-                                                                    # run 'rtabmap-recovery ~/.ros/rtabmap.db' to recover corrupted db
+                        "database_path": '/home/pi/.ros/rtabmap_lib_floor2.db' # if you see something about missing words in a dictionary, 
+                                                                               # run 'rtabmap-recovery ~/.ros/rtabmap.db' to recover corrupted db
                         },
                         rtab_params],
             remappings=[
