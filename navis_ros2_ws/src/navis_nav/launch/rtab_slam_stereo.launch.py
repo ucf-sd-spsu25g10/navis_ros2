@@ -12,8 +12,10 @@ from launch.conditions import IfCondition, UnlessCondition
 def generate_launch_description():
 
     stereo_pkg_dir = get_package_share_directory('stereo_cam')
-    ekf_config_path = os.path.join(stereo_pkg_dir, 'config', 'odom', 'ekf.yaml')
-    ekf_params  = ParameterFile(ekf_config_path)
+    ekf_mpu_config_path = os.path.join(stereo_pkg_dir, 'config', 'odom', 'ekf_mpu.yaml')
+    ekf_mpu_params = ParameterFile(ekf_mpu_config_path)
+    ekf_bno_config_path = os.path.join(stereo_pkg_dir, 'config', 'odom', 'ekf_bno.yaml')
+    ekf_bno_params = ParameterFile(ekf_bno_config_path)
 
     bno_pkg_dir = get_package_share_directory('bno08x_driver')
     bno_imu_config_path = os.path.join(bno_pkg_dir, 'config', 'bno085_i2c.yaml')
@@ -54,6 +56,8 @@ def generate_launch_description():
         "Grid/MinClusterSize": "20"
     }
 
+    use_bno = LaunchConfiguration('use_bno')
+
     return LaunchDescription([
         DeclareLaunchArgument('localization', default_value='false', description='Run in localization mode'),
         DeclareLaunchArgument('use_sim_time', default_value='false'),
@@ -72,7 +76,7 @@ def generate_launch_description():
             emulate_tty=True,
             parameters=[mpu_imu_params],
             arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level')],
-            condition=UnlessCondition(LaunchConfiguration('use_bno'))
+            condition=UnlessCondition(use_bno)
         ),
 
         Node(
@@ -81,7 +85,7 @@ def generate_launch_description():
             name='bno08x_driver',
             output='screen',
             parameters=[bno_imu_params],
-            condition=IfCondition(LaunchConfiguration('use_bno'))
+            condition=IfCondition(use_bno)
         ),
 
         # Stereo camera pipeline
@@ -102,8 +106,17 @@ def generate_launch_description():
             executable='ekf_node',
             name='ekf_filter_node',
             output='screen',
-            parameters=[ekf_params],
-            arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level')]
+            parameters=[ekf_bno_params],
+            condition=IfCondition(use_bno)
+        ),
+
+        Node(
+            package='robot_localization',
+            executable='ekf_node',
+            name='ekf_filter_node',
+            output='screen',
+            parameters=[ekf_mpu_params],
+            condition=UnlessCondition(use_bno)
         ),
 
         # RTAB-Map node 
