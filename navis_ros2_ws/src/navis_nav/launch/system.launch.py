@@ -33,7 +33,8 @@ def generate_launch_description():
         launch_arguments={
             'use_raspi': use_raspi,
             'rviz': rviz,
-            'log_level': 'WARN'
+            'log_level': 'WARN',
+            'localization': 'true',
         }.items()
     )
 

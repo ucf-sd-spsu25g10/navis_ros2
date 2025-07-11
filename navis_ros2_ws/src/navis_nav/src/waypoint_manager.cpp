@@ -105,7 +105,7 @@ private:
     }
 
     void get_list() {
-        waypoint_orderer.get_unordered_list();
+        // waypoint_orderer.get_unordered_list();
         waypoint_list = waypoint_orderer.order_list();
         number_of_waypoints = waypoint_list.size();
         RCLCPP_INFO(this->get_logger(), "Ordered waypoint list received, beginning navigation to starting point. %d total waypoints", number_of_waypoints);
