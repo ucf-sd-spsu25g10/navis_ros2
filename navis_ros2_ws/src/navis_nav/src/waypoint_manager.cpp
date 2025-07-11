@@ -26,8 +26,8 @@ public:
     {
         RCLCPP_INFO(this->get_logger(), "WaypointManager node has been created");
 
-        waypoint_publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("goal", 10);
-        speaker_publisher_ = this->create_publisher<navis_msgs::msg::ControlOut>("control_output", 10);
+        waypoint_publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("/goal", 10);
+        speaker_publisher_ = this->create_publisher<navis_msgs::msg::ControlOut>("/control_output", 10);
 
         goal_reached_subscriber_ = this->create_subscription<std_msgs::msg::Bool>(
             "goal_reached",
@@ -108,7 +108,7 @@ private:
         // waypoint_orderer.get_unordered_list();
         waypoint_list = waypoint_orderer.order_list();
 
-        for (std::string& str : grocery_list) {
+        for (std::string& str : waypoint_list) {
             std::cout << str << ", " << store_map[str].aisle << ", " << store_map[str].disc_y << std::endl;
         }
 
@@ -287,9 +287,14 @@ private:
             geometry_msgs::msg::PoseStamped next_goal_msg;
             next_goal_msg.header.frame_id = "map";
             next_goal_msg.header.stamp = this->now();
-            next_goal_msg.pose.position.x = store_map[waypoint_list[cur_waypoint_idx]].cont_x;  // your logic here
+            next_goal_msg.pose.position.x = store_map[waypoint_list[cur_waypoint_idx]].cont_x;
             next_goal_msg.pose.position.y = store_map[waypoint_list[cur_waypoint_idx]].cont_y;
             next_goal_msg.pose.orientation.w = 1.0;
+
+            RCLCPP_INFO(this->get_logger(), "Publishing goal: (%.2f, %.2f)", 
+                store_map[waypoint_list[cur_waypoint_idx]].cont_x,
+                store_map[waypoint_list[cur_waypoint_idx]].cont_y);
+
 
             waypoint_publisher_->publish(next_goal_msg);
             RCLCPP_INFO(this->get_logger(), "\n");
