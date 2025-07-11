@@ -41,7 +41,7 @@ public:
         //     std::bind(&WaypointManager::button_callback, this, std::placeholders::_1)
         // );
 
-        cur_waypoint_idx = 0;
+        cur_waypoint_idx = -1;
         number_of_waypoints = 0;
 
         get_list();
@@ -155,7 +155,12 @@ private:
 
             navis_msgs::msg::ControlOut control_msg;
             control_msg.buzzer_strength = 0;
-            std::string cur_waypoint_str = waypoint_list[cur_waypoint_idx];
+            std::string cur_waypoint_str;
+            if (cur_waypoint_idx == -1) {
+                cur_waypoint_str == "";
+            } else {
+                cur_waypoint_str; = waypoint_list[cur_waypoint_idx];
+            }
 
             RCLCPP_INFO(this->get_logger(), "Processing Waypoint %d", cur_waypoint_idx);
 
@@ -165,8 +170,8 @@ private:
             }
 
             // First Waypoint
-            if (cur_waypoint_idx == 0) {
-                RCLCPP_INFO(this->get_logger(), "Navigating to starting point", store_map[cur_waypoint_str].aisle);
+            if (cur_waypoint_idx == -1) {
+                RCLCPP_INFO(this->get_logger(), "Navigating to starting point");
                 
                 control_msg.speaker_wav_index = wav_map_.at("first");
                 speaker_publisher_->publish(control_msg);

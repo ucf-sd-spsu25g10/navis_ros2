@@ -78,7 +78,7 @@ def generate_launch_description():
 
         waypoint_manager,
         slam,
-        controller_manager,
+        # controller_manager,
         # spawn_gpio_controller,
         # control_out_node,
         control_action_calc,
