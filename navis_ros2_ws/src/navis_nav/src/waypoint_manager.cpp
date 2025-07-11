@@ -114,6 +114,26 @@ private:
 
         number_of_waypoints = waypoint_list.size();
         RCLCPP_INFO(this->get_logger(), "Ordered waypoint list received, beginning navigation to starting point. %d total waypoints", number_of_waypoints);
+
+        geometry_msgs::msg::PoseStamped next_goal_msg;
+        next_goal_msg.header.frame_id = "map";
+        next_goal_msg.header.stamp = this->now();
+
+        next_goal_msg.pose.position.x = 0.0;
+        next_goal_msg.pose.position.y = 0.0;
+        next_goal_msg.pose.position.z = 0.0;
+
+        next_goal_msg.pose.orientation.x = 0.0;
+        next_goal_msg.pose.orientation.y = 0.0;
+        next_goal_msg.pose.orientation.z = 0.0;
+        next_goal_msg.pose.orientation.w = 0.0;
+
+        RCLCPP_INFO(this->get_logger(), "Publishing goal: (%.2f, %.2f)", 
+            store_map[waypoint_list[cur_waypoint_idx]].cont_x,
+            store_map[waypoint_list[cur_waypoint_idx]].cont_y);
+
+
+        waypoint_publisher_->publish(next_goal_msg);
         
         auto bool_msg = std::make_shared<std_msgs::msg::Bool>();
         bool_msg->data = true;
