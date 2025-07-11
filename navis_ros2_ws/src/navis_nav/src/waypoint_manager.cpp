@@ -30,7 +30,7 @@ public:
         speaker_publisher_ = this->create_publisher<navis_msgs::msg::ControlOut>("/control_output", 10);
 
         goal_reached_subscriber_ = this->create_subscription<std_msgs::msg::Bool>(
-            "goal_reached",
+            "/goal_reached",
             rclcpp::QoS(10),
             std::bind(&WaypointManager::ros_goal_reached_callback, this, std::placeholders::_1)
         );
@@ -287,8 +287,14 @@ private:
             geometry_msgs::msg::PoseStamped next_goal_msg;
             next_goal_msg.header.frame_id = "map";
             next_goal_msg.header.stamp = this->now();
+
             next_goal_msg.pose.position.x = store_map[waypoint_list[cur_waypoint_idx]].cont_x;
             next_goal_msg.pose.position.y = store_map[waypoint_list[cur_waypoint_idx]].cont_y;
+            next_goal_msg.pose.position.z = 0.0;
+
+            next_goal_msg.pose.orientation.x = 0.0;
+            next_goal_msg.pose.orientation.y = 0.0;
+            next_goal_msg.pose.orientation.z = 0.0;
             next_goal_msg.pose.orientation.w = 1.0;
 
             RCLCPP_INFO(this->get_logger(), "Publishing goal: (%.2f, %.2f)", 
