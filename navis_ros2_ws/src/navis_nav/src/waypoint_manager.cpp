@@ -159,7 +159,7 @@ private:
             if (cur_waypoint_idx == -1) {
                 cur_waypoint_str == "";
             } else {
-                cur_waypoint_str; = waypoint_list[cur_waypoint_idx];
+                cur_waypoint_str = waypoint_list[cur_waypoint_idx];
             }
 
             RCLCPP_INFO(this->get_logger(), "Processing Waypoint %d", cur_waypoint_idx);
@@ -180,9 +180,9 @@ private:
                 control_msg.speaker_wav_index = wav_map_.at("aisle");
                 speaker_publisher_->publish(control_msg);
 
-                std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-                control_msg.speaker_wav_index = wav_map_.at(std::to_string(store_map[cur_waypoint_str].aisle));
-                speaker_publisher_->publish(control_msg);
+                // std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+                // control_msg.speaker_wav_index = wav_map_.at(std::to_string(store_map[cur_waypoint_str].aisle));
+                // speaker_publisher_->publish(control_msg);
             }
 
             // Final Waypoint
