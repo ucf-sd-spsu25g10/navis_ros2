@@ -44,7 +44,12 @@ public:
         cur_waypoint_idx = -1;
         number_of_waypoints = 0;
 
-        get_list();
+        timer_ = this->create_wall_timer(
+            std::chrono::milliseconds(100000),  // delay
+            [this]() {
+                get_list();
+            }
+        );
         // RCLCPP_INFO(this->get_logger(), "Waiting for button press to start...");
     }
 
@@ -55,6 +60,8 @@ private:
 
     rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr waypoint_publisher_;
     rclcpp::Publisher<navis_msgs::msg::ControlOut>::SharedPtr speaker_publisher_;
+
+    rclcpp::TimerBase::SharedPtr timer_;
 
     std::vector<std::string> waypoint_list;
     int cur_waypoint_idx, number_of_waypoints;
@@ -114,26 +121,6 @@ private:
 
         number_of_waypoints = waypoint_list.size();
         RCLCPP_INFO(this->get_logger(), "Ordered waypoint list received, beginning navigation to starting point. %d total waypoints", number_of_waypoints);
-
-        geometry_msgs::msg::PoseStamped next_goal_msg;
-        next_goal_msg.header.frame_id = "map";
-        next_goal_msg.header.stamp = this->now();
-
-        next_goal_msg.pose.position.x = 0.0;
-        next_goal_msg.pose.position.y = 0.0;
-        next_goal_msg.pose.position.z = 0.0;
-
-        next_goal_msg.pose.orientation.x = 0.0;
-        next_goal_msg.pose.orientation.y = 0.0;
-        next_goal_msg.pose.orientation.z = 0.0;
-        next_goal_msg.pose.orientation.w = 0.0;
-
-        RCLCPP_INFO(this->get_logger(), "Publishing goal: (%.2f, %.2f)", 
-            store_map[waypoint_list[cur_waypoint_idx]].cont_x,
-            store_map[waypoint_list[cur_waypoint_idx]].cont_y);
-
-
-        waypoint_publisher_->publish(next_goal_msg);
         
         auto bool_msg = std::make_shared<std_msgs::msg::Bool>();
         bool_msg->data = true;
@@ -157,6 +144,7 @@ private:
     // }
 
     void ros_goal_reached_callback(const std_msgs::msg::Bool::SharedPtr msg) {
+        timer_->cancel();
         if (msg->data) {
             // RCLCPP_INFO(this->get_logger(), "Waypoint reached. Waiting for button press to get next item.");
 
