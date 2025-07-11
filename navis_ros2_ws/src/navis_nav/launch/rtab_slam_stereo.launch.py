@@ -40,8 +40,6 @@ def generate_launch_description():
         'Grid/3D': "False",
         'RGBD/CreateOccupancyGrid': "True",
         'Vis/CorType': "1", #better
-        # Rtabmap/DatabasePath: "~/.ros/rtabmap.db" # if you see something about missing words in a dictionary, 
-        #               run 'rtabmap-recovery ~/.ros/rtabmap.db' to recover corrupted db
         
         # Dont know if these actually do anything, but they were on performance recommendations in this tutorial: 
         # https://wiki.ros.org/rtabmap_ros/Tutorials/Advanced%20Parameter%20Tuning
@@ -78,7 +76,7 @@ def generate_launch_description():
         ),
 
         Node(
-            package='bno08x_ros2_driver',  
+            package='bno08x_driver',  
             executable='bno08x_driver',  
             name='bno08x_driver',
             output='screen',
@@ -117,6 +115,8 @@ def generate_launch_description():
             parameters=[{
                         'Mem/IncrementalMemory':  "false",
                         'Mem/InitWMWithAllNodes': "true",
+                        "Rtabmap/DatabasePath": "~/.ros/rtabmap_lib_floor2.db" # if you see something about missing words in a dictionary, 
+                                                                    # run 'rtabmap-recovery ~/.ros/rtabmap.db' to recover corrupted db
                         },
                         rtab_params],
             remappings=[

@@ -208,7 +208,7 @@ private:
                 speaker_publisher_->publish(control_msg);
                 
                 std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-                ontrol_msg.speaker_wav_index = wav_map_.at("turn");
+                control_msg.speaker_wav_index = wav_map_.at("turn");
                 speaker_publisher_->publish(control_msg);
 
                 std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
