@@ -26,11 +26,11 @@ public:
     {
         RCLCPP_INFO(this->get_logger(), "WaypointManager node has been created");
 
-        waypoint_publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("rtabmap/goal", 10);
+        waypoint_publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("goal", 10);
         speaker_publisher_ = this->create_publisher<navis_msgs::msg::ControlOut>("control_output", 10);
 
         goal_reached_subscriber_ = this->create_subscription<std_msgs::msg::Bool>(
-            "rtabmap/goal_reached",
+            "goal_reached",
             rclcpp::QoS(10),
             std::bind(&WaypointManager::ros_goal_reached_callback, this, std::placeholders::_1)
         );
@@ -45,7 +45,7 @@ public:
         number_of_waypoints = 0;
 
         get_list();
-        RCLCPP_INFO(this->get_logger(), "Waiting for button press to start...");
+        // RCLCPP_INFO(this->get_logger(), "Waiting for button press to start...");
     }
 
 private:
@@ -108,43 +108,45 @@ private:
         waypoint_orderer.get_unordered_list();
         waypoint_list = waypoint_orderer.order_list();
         number_of_waypoints = waypoint_list.size();
-        RCLCPP_INFO(this->get_logger(), "Ordered waypoint list received, ready to begin navigation on button press");
+        RCLCPP_INFO(this->get_logger(), "Ordered waypoint list received, beginning navigation");
+        process_waypoint_logic(msg);
     }
 
-    void button_callback(const std_msgs::msg::Float64::SharedPtr msg) {
-        if (msg->data > 0.5) { // Button is pressed
-            std::lock_guard<std::mutex> lock(goal_mutex_);
-            if (cur_waypoint_idx > 0) {
-                RCLCPP_INFO(this->get_logger(), "Button pressed, continuing navigation.");
-                button_pressed_ = true;
-                cv_.notify_one();
-            } else {
-                RCLCPP_INFO(this->get_logger(), "Button pressed, starting navigation.");
-                auto bool_msg = std::make_shared<std_msgs::msg::Bool>();
-                bool_msg->data = true;
-                process_waypoint_logic(bool_msg);
-            }
-        }
-    }
+    // void button_callback(const std_msgs::msg::Float64::SharedPtr msg) {
+    //     if (msg->data > 0.5) { // Button is pressed
+    //         std::lock_guard<std::mutex> lock(goal_mutex_);
+    //         if (cur_waypoint_idx > 0) {
+    //             RCLCPP_INFO(this->get_logger(), "Button pressed, continuing navigation.");
+    //             button_pressed_ = true;
+    //             cv_.notify_one();
+    //         } else {
+    //             RCLCPP_INFO(this->get_logger(), "Button pressed, starting navigation.");
+    //             auto bool_msg = std::make_shared<std_msgs::msg::Bool>();
+    //             bool_msg->data = true;
+    //             process_waypoint_logic(bool_msg);
+    //         }
+    //     }
+    // }
 
     void ros_goal_reached_callback(const std_msgs::msg::Bool::SharedPtr msg) {
         if (msg->data) {
-            RCLCPP_INFO(this->get_logger(), "Waypoint reached. Waiting for button press to get next item.");
+            // RCLCPP_INFO(this->get_logger(), "Waypoint reached. Waiting for button press to get next item.");
 
-            std::unique_lock<std::mutex> lock(goal_mutex_);
-            button_pressed_ = false; // Reset before waiting
-            cv_.wait(lock, [this]{ return button_pressed_; });
-            lock.unlock();
+            // std::unique_lock<std::mutex> lock(goal_mutex_);
+            // button_pressed_ = false; // Reset before waiting
+            // cv_.wait(lock, [this]{ return button_pressed_; });
+            // lock.unlock();
 
             // Debounce
             std::this_thread::sleep_for(std::chrono::seconds(1));
 
+            RCLCPP_INFO(this->get_logger(), "Waypoint reached. Navigating to next waypoint.");
             process_waypoint_logic(msg);
         }
     }
 
     void process_waypoint_logic(const std_msgs::msg::Bool::SharedPtr msg) {
-        std::lock_guard<std::mutex> lock(goal_mutex_);
+        // std::lock_guard<std::mutex> lock(goal_mutex_);
         
         if (msg->data) {
 

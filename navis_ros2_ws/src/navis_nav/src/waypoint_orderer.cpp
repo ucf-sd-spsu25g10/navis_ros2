@@ -31,12 +31,15 @@ void WaypointOrderer::get_unordered_list() {
 
     // Wait until a list is received (not in a ros2 topic)
     // get_unordered_list();
-    grocery_list = {"item_f",
-                    "item_b",
+    grocery_list = {
                     "item_a",
-                    "item_d",
+                    "item_b",
                     "item_c",
-                    "item_e",};
+                    
+                    // "item_f",
+                    // "item_d",
+                    // "item_e",
+                   };
 
     int cur_aisle = store_map[grocery_list[0]].aisle;
     grocery_list.insert(grocery_list.begin(), "aisle" + std::to_string(cur_aisle) + "_top");

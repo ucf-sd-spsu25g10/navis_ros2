@@ -58,7 +58,7 @@ def generate_launch_description():
         DeclareLaunchArgument('localization', default_value='false', description='Run in localization mode'),
         DeclareLaunchArgument('use_sim_time', default_value='false'),
         DeclareLaunchArgument('log_level', default_value='WARN'),
-        DeclareLaunchArgument('use_raspi', default_value='false'),
+        DeclareLaunchArgument('use_raspi', default_value='true'),
         DeclareLaunchArgument('use_bno', default_value='true'),
 
         # IMU driver 
@@ -113,7 +113,7 @@ def generate_launch_description():
             name='rtabmap',
             output='screen',
             parameters=[{
-                        'Mem/IncrementalMemory':  "false",
+                        'Mem/IncrementalMemory': "false",
                         'Mem/InitWMWithAllNodes': "true",
                         "Rtabmap/DatabasePath": "~/.ros/rtabmap_lib_floor2.db" # if you see something about missing words in a dictionary, 
                                                                     # run 'rtabmap-recovery ~/.ros/rtabmap.db' to recover corrupted db

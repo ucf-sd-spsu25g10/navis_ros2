@@ -4,7 +4,7 @@ from launch_ros.actions import Node
 """
 Launch file created to independently test the functionality of the ordering and management systems
 
-ros2 topic pub /rtabmap/goal_reached std_msgs/msg/Bool "{data: true}"
+ros2 topic pub /goal_reached std_msgs/msg/Bool "{data: true}"
 
 """
 

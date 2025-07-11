@@ -14,12 +14,13 @@ std::unordered_map<std::string, Item> store_map = {
     // int shelf_height;
     // bool side_of_aisle; what side of aisle the item is on, left is true. left is in respect to looking at the aisle from the bottom (low y)
 
-    {"start_pose", {"start_pose", -1, 0.0, 2.0, 0.0, 0, true}},
-    {"final_pose", {"final_pose", -2, 0.0, 2.0, 0.0, 0, true}},
+    {"start_pose", {"start_pose", -1, 0.0, 0.5, 0.0, 0, true}},
+    {"final_pose", {"final_pose", -2, 0.0, 0.5, 0.0, 0, true}},
 
-    {"item_a", {"a", 2, 3.4, 2.0, -2.0, 1, true}},
-    {"item_b", {"a", 3, 6.7, 2.0, -6.0, 1, false}},
-    {"item_c", {"a", 3, 4.1, 0.0, -2.0, 1, true}},
+    {"item_a", {"a", 1, 4.1, 0.3, 7.0, 1, true}},
+    {"item_b", {"a", 2, 6.7, 1.2, 7.0, 1, false}},
+    {"item_c", {"a", 3, 3.4, 2.25, 7.0, 1, true}},
+
     {"item_d", {"a", 3, 1.3, 0.0, -6.0, 1, true}},
     {"item_e", {"a", 5, 7.8, -2.0, -2.0, 1, false}},
     {"item_f", {"a", 5, 8.5, -2.0, -6.0, 1, true}},

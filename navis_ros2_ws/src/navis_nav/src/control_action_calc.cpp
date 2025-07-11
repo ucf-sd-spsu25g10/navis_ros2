@@ -17,7 +17,7 @@ public:
         control_publisher_ = this->create_publisher<navis_msgs::msg::ControlOut>("/control_output", 10);
 
         path_subscriber_ = this->create_subscription<nav_msgs::msg::Path>(
-            "/rtabmap/local_path",
+            "local_path",
             rclcpp::QoS(10),
             std::bind(&ControlActionCalc::path_callback, this, std::placeholders::_1)
         );
