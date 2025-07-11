@@ -15,7 +15,7 @@ def generate_launch_description():
     ekf_config_path = os.path.join(stereo_pkg_dir, 'config', 'odom', 'ekf.yaml')
     ekf_params  = ParameterFile(ekf_config_path)
 
-    bno_pkg_dir = get_package_share_directory('bno08x_ros2_driver'),
+    bno_pkg_dir = get_package_share_directory('bno08x_driver')
     bno_imu_config_path = os.path.join(bno_pkg_dir, 'config', 'bno085_i2c.yaml')
     bno_imu_params = ParameterFile(bno_imu_config_path)
 
