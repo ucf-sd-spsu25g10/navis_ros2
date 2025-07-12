@@ -16,7 +16,7 @@ class WaypointOrderer
 public:
     WaypointOrderer();
     void get_unordered_list();
-    std::vector<std::string> order_list();
+    std::vector<std::string> get_list();
 
 private:
   std::vector<std::string> grocery_list;

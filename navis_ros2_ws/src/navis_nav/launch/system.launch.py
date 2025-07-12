@@ -80,5 +80,5 @@ def generate_launch_description():
         # controller_manager,
         # spawn_gpio_controller,
         # control_out_node,
-        control_action_calc,
+        # control_action_calc,
     ])
