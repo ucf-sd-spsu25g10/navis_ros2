@@ -22,7 +22,7 @@ def generate_launch_description():
     )
 
     waypoint_manager_delayed = TimerAction(
-        period=10.0,  # seconds
+        period=20.0,  # seconds
         actions=[waypoint_manager]
     )
 

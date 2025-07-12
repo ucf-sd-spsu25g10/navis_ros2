@@ -17,7 +17,7 @@ std::unordered_map<std::string, Item> store_map = {
     {"start_pose", {"start_pose", -1, 0.0, 0.5, 0.0, 0, true}},
     {"final_pose", {"final_pose", -2, 0.0, 0.5, 0.0, 0, true}},
 
-    {"item_a", {"a", 1, 4.1, 0.3, 7.0, 1, true}},
+    {"item_a", {"a", 1, 4.1, 0.3, 3.5, 1, true}},
     {"item_b", {"a", 2, 6.7, 1.2, 7.0, 1, false}},
     {"item_c", {"a", 3, 3.4, 2.25, 7.0, 1, true}},
 

@@ -43,9 +43,10 @@ public:
 
         cur_waypoint_idx = -1;
         number_of_waypoints = 0;
+        got_list = false;
 
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(100000),  // delay
+            std::chrono::milliseconds(100),  // delay
             [this]() {
                 get_list();
             }
@@ -67,6 +68,7 @@ private:
     int cur_waypoint_idx, number_of_waypoints;
 
     WaypointOrderer waypoint_orderer;
+    bool got_list;
 
     std::mutex goal_mutex_;
     std::condition_variable cv_;
@@ -113,18 +115,22 @@ private:
 
     void get_list() {
         // waypoint_orderer.get_unordered_list();
-        waypoint_list = waypoint_orderer.order_list();
+        if (!got_list) {
 
-        for (std::string& str : waypoint_list) {
-            std::cout << str << ", " << store_map[str].aisle << ", " << store_map[str].disc_y << std::endl;
+            got_list = true;
+            waypoint_list = waypoint_orderer.order_list();
+    
+            for (std::string& str : waypoint_list) {
+                std::cout << str << ", " << store_map[str].aisle << ", " << store_map[str].disc_y << std::endl;
+            }
+    
+            number_of_waypoints = waypoint_list.size();
+            RCLCPP_INFO(this->get_logger(), "Ordered waypoint list received, beginning navigation to starting point. %d total waypoints", number_of_waypoints);
+            
+            auto bool_msg = std::make_shared<std_msgs::msg::Bool>();
+            bool_msg->data = true;
+            process_waypoint_logic(bool_msg);
         }
-
-        number_of_waypoints = waypoint_list.size();
-        RCLCPP_INFO(this->get_logger(), "Ordered waypoint list received, beginning navigation to starting point. %d total waypoints", number_of_waypoints);
-        
-        auto bool_msg = std::make_shared<std_msgs::msg::Bool>();
-        bool_msg->data = true;
-        process_waypoint_logic(bool_msg);
     }
 
     // void button_callback(const std_msgs::msg::Float64::SharedPtr msg) {
@@ -185,6 +191,26 @@ private:
             // First Waypoint
             if (cur_waypoint_idx == -1) {
                 RCLCPP_INFO(this->get_logger(), "Navigating to starting point");
+
+                geometry_msgs::msg::PoseStamped next_goal_msg;
+                next_goal_msg.header.frame_id = "map";
+                next_goal_msg.header.stamp = this->now();
+
+                next_goal_msg.pose.position.x = 0.0;
+                next_goal_msg.pose.position.y = 0.0;
+                next_goal_msg.pose.position.z = 0.0;
+
+                next_goal_msg.pose.orientation.x = 0.0;
+                next_goal_msg.pose.orientation.y = 0.0;
+                next_goal_msg.pose.orientation.z = 0.0;
+                next_goal_msg.pose.orientation.w = 1.0;
+
+                RCLCPP_INFO(this->get_logger(), "Publishing goal: (%.2f, %.2f)", 
+                    store_map[waypoint_list[cur_waypoint_idx]].cont_x,
+                    store_map[waypoint_list[cur_waypoint_idx]].cont_y);
+
+
+                waypoint_publisher_->publish(next_goal_msg);
                 
                 // control_msg.speaker_wav_index = wav_map_.at("first");
                 // speaker_publisher_->publish(control_msg);
