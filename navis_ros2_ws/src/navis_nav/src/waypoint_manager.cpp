@@ -245,15 +245,15 @@ private:
         if (cur_waypoint_idx == -1) {
             RCLCPP_INFO(this->get_logger(), "Navigating to starting point");
             
-            // control_msg.speaker_wav_index = wav_map_.at("first");
+            // control_msg.speaker_wav_index = wav_map_("first");
             // speaker_publisher_->publish(control_msg);
         
             // std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-            // control_msg.speaker_wav_index = wav_map_.at("aisle");
+            // control_msg.speaker_wav_index = wav_map_("aisle");
             // speaker_publisher_->publish(control_msg);
 
             // std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-            // control_msg.speaker_wav_index = wav_map_.at(std::to_string(store_map[cur_waypoint_str].aisle));
+            // control_msg.speaker_wav_index = wav_map_(std::to_string(store_map[cur_waypoint_str].aisle));
             // speaker_publisher_->publish(control_msg);
         }
 
@@ -297,7 +297,7 @@ private:
             control_msg.speaker_wav_index = wav_map_.at("around");
             speaker_publisher_->publish(control_msg);
             
-            // add_go_straight_cmd(false);
+            add_go_straight_cmd(false);
             
             RCLCPP_INFO(this->get_logger(), "Final Item %s Reached, Indicating shelf %d, Indicating on side %s, Indicating turn around", cur_waypoint_str.c_str(), store_map[cur_waypoint_str].shelf_height, l_r_str.c_str());
         }
@@ -329,7 +329,7 @@ private:
             
             RCLCPP_INFO(this->get_logger(), "Item %s Reached, Indicating shelf %d, Indicating on side %s", cur_waypoint_str.c_str(), store_map[cur_waypoint_str].shelf_height, l_r_str.c_str());
 
-            // add_go_straight_cmd(false);
+            add_go_straight_cmd(false);
 
         }
 
@@ -350,18 +350,13 @@ private:
         
         cur_waypoint_idx++;
 
-            // Process the message to be published
+        // Process the message to be published, this is purely for rviz visualization
         geometry_msgs::msg::PoseStamped next_goal_msg;
         next_goal_msg.header.frame_id = "map";
         next_goal_msg.header.stamp = this->now();
 
         next_goal_msg.pose.position.x = store_map[waypoint_list[cur_waypoint_idx]].cont_x;
         next_goal_msg.pose.position.y = store_map[waypoint_list[cur_waypoint_idx]].cont_y;
-        next_goal_msg.pose.position.z = 0.0;
-
-        next_goal_msg.pose.orientation.x = 0.0;
-        next_goal_msg.pose.orientation.y = 0.0;
-        next_goal_msg.pose.orientation.z = 0.0;
         next_goal_msg.pose.orientation.w = 1.0;
 
         RCLCPP_INFO(this->get_logger(), "New goal: (%.2f, %.2f)", 

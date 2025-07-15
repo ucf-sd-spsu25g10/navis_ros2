@@ -62,11 +62,6 @@ def generate_launch_description():
     #     package='navis_nav',
     #     executable='control_out_node',
     # )
-
-    control_action_calc = Node(
-        package='navis_nav',
-        executable='control_action_calc'
-    )
     
 
     return LaunchDescription([
@@ -80,5 +75,4 @@ def generate_launch_description():
         # controller_manager,
         # spawn_gpio_controller,
         # control_out_node,
-        # control_action_calc,
     ])

@@ -30,14 +30,6 @@ add_executable(control_out_node
   src/control_out_node.cpp
 )
 
-add_executable(control_action_calc
-  src/control_action_calc.cpp
-)
-
-add_executable(bag_recorder
-  src/bag_recorder.cpp
-)
-
 add_executable(waypoint_manager
   src/waypoint_manager.cpp
   src/grocery_locations.cpp
@@ -45,7 +37,7 @@ add_executable(waypoint_manager
 )
 
 # Include dirs per target
-foreach(target IN ITEMS control_out_node waypoint_manager control_action_calc)
+foreach(target IN ITEMS control_out_node waypoint_manager)
   target_include_directories(${target} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
@@ -71,27 +63,10 @@ ament_target_dependencies(control_out_node
   navis_msgs
 )
 
-ament_target_dependencies(control_action_calc 
-  rclcpp
-  rclcpp_components
-  nav_msgs
-  navis_msgs
-  geometry_msgs
-  tf2
-)
-
-ament_target_dependencies(bag_recorder
-  rclcpp
-  sensor_msgs
-  rosbag2_cpp
-)
-
 # Install executables
 install(TARGETS 
   control_out_node
-  control_action_calc
   waypoint_manager
-  bag_recorder
   DESTINATION lib/${PROJECT_NAME}
 )
 
