@@ -26,7 +26,7 @@ public:
 private:
 
     void open_uart() {
-        uart_fd_ = open("/dev/ttyAMA1", O_RDWR);
+        uart_fd_ = open("/dev/ttyAMA0", O_RDWR);
         if (uart_fd_ < 0) {
             RCLCPP_ERROR(this->get_logger(), "Error opening UART");
             return;

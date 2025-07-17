@@ -81,7 +81,7 @@ private:
 
     #include "navis_nav/audio_mappings.hpp"
 
-    int sleep_time_ms = 500;
+    int sleep_time_ms = 250;
 
     const std::unordered_map<std::string, int>& wav_map_;
 

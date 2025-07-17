@@ -58,10 +58,10 @@ def generate_launch_description():
     #     output="screen",
     # )
 
-    # control_out_node = Node(
-    #     package='navis_nav',
-    #     executable='control_out_node',
-    # )
+    control_out_node = Node(
+        package='navis_nav',
+        executable='control_out_node',
+    )
     
 
     return LaunchDescription([
@@ -74,5 +74,5 @@ def generate_launch_description():
         slam,
         # controller_manager,
         # spawn_gpio_controller,
-        # control_out_node,
+        control_out_node,
     ])
