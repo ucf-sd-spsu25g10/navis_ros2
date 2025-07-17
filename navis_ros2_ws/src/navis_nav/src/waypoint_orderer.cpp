@@ -126,23 +126,49 @@ std::vector<int> WaypointOrderer::get_list_uart() {
   while (true) {
     if (read(uart_fd, &c, 1) > 0) {
       if (c == ';') break;
-      if (c == ',') {
-        if (!buffer.empty()) {
-          numbers.push_back(std::stoi(buffer));
-          buffer.clear();
-        }
-      } else if (isdigit(c)) {
-        buffer += c;
-      }
+      buffer += c;
     }
   }
-  
-  // Add last number if exists
-  if (!buffer.empty()) {
-    numbers.push_back(std::stoi(buffer));
+  close(uart_fd);
+
+  // Trim whitespace
+  buffer.erase(0, buffer.find_first_not_of(" \n\r\t"));
+  buffer.erase(buffer.find_last_not_of(" \n\r\t") + 1);
+
+  // Check for JSON array
+  if (!buffer.empty() && buffer[0] == '[') {
+    // Parse JSON array manually (no external library)
+    std::string num;
+    for (size_t i = 1; i < buffer.size(); ++i) {
+      char ch = buffer[i];
+      if (isdigit(ch)) {
+        num += ch;
+      } else if (ch == ',' || ch == ']') {
+        if (!num.empty()) {
+          numbers.push_back(std::stoi(num));
+          num.clear();
+        }
+        if (ch == ']') break;
+      }
+    }
+  } else {
+    // Original comma-separated parsing
+    std::string num;
+    for (char ch : buffer) {
+      if (isdigit(ch)) {
+        num += ch;
+      } else if (ch == ',') {
+        if (!num.empty()) {
+          numbers.push_back(std::stoi(num));
+          num.clear();
+        }
+      }
+    }
+    if (!num.empty()) {
+      numbers.push_back(std::stoi(num));
+    }
   }
 
-  close(uart_fd);
   return numbers;
 }
 
