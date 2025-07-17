@@ -31,6 +31,7 @@ inline const std::unordered_map<std::string, int>& get_wav_map() {
                             // "Item is on" -> left/right (3/4)
         {"aisle", 19},      // "Aisle"
         {"shelf", 20},      // "Shelf"
+        {"obstacle", 21}    // "Obstacle is"
     };
     return wav_map_instance;
 }
