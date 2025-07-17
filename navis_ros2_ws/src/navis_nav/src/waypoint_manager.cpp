@@ -37,12 +37,6 @@ public:
             std::bind(&WaypointManager::pose_callback, this, std::placeholders::_1)
         );
 
-        // button_subscriber_ = this->create_subscription<std_msgs::msg::Float64>(
-        //     "/gpio_controller/state",
-        //     rclcpp::QoS(10),
-        //     std::bind(&WaypointManager::button_callback, this, std::placeholders::_1)
-        // );
-
         cur_waypoint_idx = -1;
         number_of_waypoints = 0;
         got_list = false;
@@ -53,13 +47,11 @@ public:
                 get_list();
             }
         );
-        // RCLCPP_INFO(this->get_logger(), "Waiting for button press to start...");
     }
 
 private:
 
     rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr localization_pose_subscriber_;
-    rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr button_subscriber_;
 
     rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr waypoint_publisher_;
 
@@ -74,9 +66,7 @@ private:
     WaypointOrderer waypoint_orderer;
     bool got_list;
 
-    std::mutex goal_mutex_;
     std::condition_variable cv_;
-    bool button_pressed_ = false;
     float goal_threshold = 0.5; // meters
 
     #include "navis_nav/audio_mappings.hpp"
@@ -137,20 +127,6 @@ private:
         }
     }
 
-    // void button_callback(const std_msgs::msg::Float64::SharedPtr msg) {
-    //     if (msg->data > 0.5) { // Button is pressed
-    //         std::lock_guard<std::mutex> lock(goal_mutex_);
-    //         if (cur_waypoint_idx > 0) {
-    //             RCLCPP_INFO(this->get_logger(), "Button pressed, continuing navigation.");
-    //             button_pressed_ = true;
-    //             cv_.notify_one();
-    //         } else {
-    //             RCLCPP_INFO(this->get_logger(), "Button pressed, starting navigation.");
-    //             process_waypoint_logic();
-    //         }
-    //     }
-    // }
-
     void pose_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg) {
         
         timer_->cancel();
@@ -164,18 +140,7 @@ private:
         float distance_to_goal = std::sqrt(std::pow(goal_x - loc_x, 2) + std::pow(goal_y - loc_y, 2));
 
         if (distance_to_goal < goal_threshold) {
-            // RCLCPP_INFO(this->get_logger(), "Waypoint reached. Waiting for button press to get next item.");
-
-            // std::unique_lock<std::mutex> lock(goal_mutex_);
-            // button_pressed_ = false; // Reset before waiting
-            // cv_.wait(lock, [this]{ return button_pressed_; });
-            // lock.unlock();
-
-            // Debounce
-            // std::this_thread::sleep_for(std::chrono::seconds(1));
-
             process_waypoint_logic();
-
             RCLCPP_INFO(this->get_logger(), "Waypoint reached. Navigating to next waypoint.");
         } else {
             // Get absolute angle of line from current location to next waypoint
@@ -223,7 +188,6 @@ private:
     }
 
     void process_waypoint_logic() {
-        // std::lock_guard<std::mutex> lock(goal_mutex_);
 
         navis_msgs::msg::ControlOut control_msg;
         control_msg.buzzer_strength = 0;
@@ -243,18 +207,7 @@ private:
 
         // First Waypoint
         if (cur_waypoint_idx == -1) {
-            RCLCPP_INFO(this->get_logger(), "Navigating to starting point");
-            
-            // control_msg.speaker_wav_index = wav_map_("first");
-            // speaker_publisher_->publish(control_msg);
-        
-            // std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-            // control_msg.speaker_wav_index = wav_map_("aisle");
-            // speaker_publisher_->publish(control_msg);
-
-            // std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-            // control_msg.speaker_wav_index = wav_map_(std::to_string(store_map[cur_waypoint_str].aisle));
-            // speaker_publisher_->publish(control_msg);
+            RCLCPP_INFO(this->get_logger(), "Preprocessing starting waypoint");
         }
 
         // Final Waypoint
@@ -262,44 +215,6 @@ private:
             control_msg.speaker_wav_index = wav_map_.at("final");
             speaker_publisher_->publish(control_msg);
             RCLCPP_INFO(this->get_logger(), "Final Waypoint Reached, %s", cur_waypoint_str.c_str());
-        }
-
-        // Final Item
-        else if (cur_waypoint_idx + 2 == number_of_waypoints) {
-
-            // side_of_aisle -> true = left when looking at the aisle from the bottom
-            // l_r = l_r if headed up, !l_r if headed down
-            bool l_r = ((store_map[waypoint_list[cur_waypoint_idx]].disc_y - store_map[cur_waypoint_str].disc_y) >= 0 ) 
-                        ?  store_map[cur_waypoint_str].side_of_aisle 
-                        : !store_map[cur_waypoint_str].side_of_aisle;
-            std::string l_r_str = (l_r) ? "left" : "right";
-
-            control_msg.speaker_wav_index = wav_map_.at("item");
-            speaker_publisher_->publish(control_msg);
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-            control_msg.speaker_wav_index = wav_map_.at(l_r_str);
-            speaker_publisher_->publish(control_msg);
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-            control_msg.speaker_wav_index = wav_map_.at("shelf");
-            speaker_publisher_->publish(control_msg);
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-            control_msg.speaker_wav_index = wav_map_.at(std::to_string(store_map[cur_waypoint_str].shelf_height));
-            speaker_publisher_->publish(control_msg);
-            
-            std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-            control_msg.speaker_wav_index = wav_map_.at("turn");
-            speaker_publisher_->publish(control_msg);
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-            control_msg.speaker_wav_index = wav_map_.at("around");
-            speaker_publisher_->publish(control_msg);
-            
-            add_go_straight_cmd(false);
-            
-            RCLCPP_INFO(this->get_logger(), "Final Item %s Reached, Indicating shelf %d, Indicating on side %s, Indicating turn around", cur_waypoint_str.c_str(), store_map[cur_waypoint_str].shelf_height, l_r_str.c_str());
         }
 
         // Item 
@@ -357,6 +272,10 @@ private:
 
         next_goal_msg.pose.position.x = store_map[waypoint_list[cur_waypoint_idx]].cont_x;
         next_goal_msg.pose.position.y = store_map[waypoint_list[cur_waypoint_idx]].cont_y;
+        next_goal_msg.pose.position.z = 0.0;
+        next_goal_msg.pose.orientation.x = 0.0;
+        next_goal_msg.pose.orientation.y = 0.0;
+        next_goal_msg.pose.orientation.z = 0.0;
         next_goal_msg.pose.orientation.w = 1.0;
 
         RCLCPP_INFO(this->get_logger(), "New goal: (%.2f, %.2f)", 

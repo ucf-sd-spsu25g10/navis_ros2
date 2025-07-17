@@ -16,23 +16,22 @@ void WaypointOrderer::get_unordered_list() {
   grocery_list.clear();
   
   for (int item_num : uart_list) {
-    grocery_list.push_back("item_" + std::to_string(item_num));
+    grocery_list.push_back(index_to_item_name_map[item_num]);
   }
 }
 
 std::vector<std::string> WaypointOrderer::get_list() {
 
   // Wait until a list is received (not in a ros2 topic)
-  // get_unordered_list();
-  grocery_list = {
-                  "item_a",
-                  "item_b",
-                  "item_c",
-                  
-                  // "item_f",
-                  // "item_d",
-                  // "item_e",
-                  };
+  get_unordered_list();
+  // grocery_list = {
+  //                 "milk",
+  //                 "chicken",
+  //                 "banana",
+  //                 "cereal",
+  //                 "coffee",
+  //                 "fish"
+  //                 };
 
   int cur_aisle = store_map[grocery_list[0]].aisle;
   grocery_list.insert(grocery_list.begin(), "aisle" + std::to_string(cur_aisle) + "_top");
@@ -100,12 +99,6 @@ std::vector<std::string> WaypointOrderer::get_list() {
       return ascending ? (store_map[a].disc_y < store_map[b].disc_y) : (store_map[a].disc_y > store_map[b].disc_y);
   });
 
-  
-  grocery_list.insert(grocery_list.begin(), "start_pose");
-  int last_aisle = store_map[grocery_list[grocery_list.size()-1]].aisle;
-  grocery_list.pop_back();
-  grocery_list.insert(grocery_list.begin() + grocery_list.size(), "aisle" + std::to_string(last_aisle) + "_bottom");
-  
   // print_cur_list("heights sorted");
 
   return grocery_list;

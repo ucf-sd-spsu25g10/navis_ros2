@@ -6,7 +6,7 @@ const float AISLE_MAX_HEIGHT_CONT = 10.0;
 // Define the hash table instance
 std::unordered_map<std::string, Item> store_map = {
 
-    // std::string name;
+    // int index;
     // int aisle;
     // float disc_y;
     // float cont_x
@@ -14,34 +14,52 @@ std::unordered_map<std::string, Item> store_map = {
     // int shelf_height;
     // bool side_of_aisle; what side of aisle the item is on, left is true. left is in respect to looking at the aisle from the bottom (low y)
 
-    {"start_pose", {"start_pose", -1, 0.0, 0.5, 0.0, 0, true}},
-    {"final_pose", {"final_pose", -2, 0.0, 0.5, 0.0, 0, true}},
+    {"milk",            {0,  1, 1.0, 16.0, 39.4, 1, false}},
+    {"bread",           {1,  1, 2.0, 26.0, 38.3, 1, true}},
+    {"eggs",            {2,  1, 3.0, 37.0, 37.8, 1, false}},
+    {"chicken",         {3,  2, 1.0, 10.0, 26.3, 1, true}},
+    {"banana",          {4,  2, 2.0, 29.0, 27.4, 1, false}},
+    {"cereal",          {5,  3, 1.0, 13.0, 9.2, 1, true}},
+    {"coffee",          {6,  3, 2.0, 23.0, 10.5, 1, false}},
+    {"carrot",          {7,  3, 3.0, 29.0, 11.5, 1, true}},
+    {"fish",            {8,  4, 1.0, 10.0, 0.6, 0, false}},
+    {"cheese",          {9,  4, 2.0, 25.0, 0.8, 0, true}},
 
-    {"item_a", {"a", 1, 4.1, 0.3, 3.5, 1, true}},
-    {"item_b", {"a", 2, 6.7, 1.2, 7.0, 1, false}},
-    {"item_c", {"a", 3, 3.4, 2.25, 7.0, 1, true}},
+    {"start_pose",      {10, -1, 0.0, 10.0, 40.0, 0, true}},
+    {"final_pose",      {11, -1, 0.0, 3.0, 32.5, 0, true}},
 
-    {"item_d", {"a", 3, 1.3, 0.0, -6.0, 1, true}},
-    {"item_e", {"a", 5, 7.8, -2.0, -2.0, 1, false}},
-    {"item_f", {"a", 5, 8.5, -2.0, -6.0, 1, true}},
+    {"aisle1_bottom",   {12, 1, AISLE_MIN_HEIGHT_CONT, 10.0, 40.0, 0, true}},
+    {"aisle1_top",      {13, 1, AISLE_MAX_HEIGHT_CONT, 40.5, 37.3, 0, true}},
+    {"aisle2_bottom",   {14, 2, AISLE_MIN_HEIGHT_CONT, 2.5, 26.7, 0, true}},
+    {"aisle2_top",      {15, 2, AISLE_MAX_HEIGHT_CONT, 38.4, 27.0, 0, true}},
+    {"aisle3_bottom",   {16, 3, AISLE_MIN_HEIGHT_CONT, 0.2, 11.0, 0, true}},
+    {"aisle3_top",      {17, 3, AISLE_MAX_HEIGHT_CONT, 37.4, 11.5, 0, true}},
+    {"aisle4_bottom",   {18, 4, AISLE_MIN_HEIGHT_CONT, 0.0, 0.0, 0, true}},
+    {"aisle4_top",      {19, 4, AISLE_MAX_HEIGHT_CONT, 37.5, 0.0, 0, true}},
     
-    {"aisle1_bottom", {"a", 1, AISLE_MIN_HEIGHT_CONT, 0.5, 0.5, 0, true}},
-    {"aisle1_top",    {"a", 1, AISLE_MAX_HEIGHT_CONT, 0.2, 13.0, 0, true}},
-    {"aisle2_bottom", {"a", 2, AISLE_MIN_HEIGHT_CONT, 1.3, 0.75, 0, true}},
-    {"aisle2_top",    {"a", 2, AISLE_MAX_HEIGHT_CONT, 1.25, 13.0, 0, true}},
-    {"aisle3_bottom", {"a", 3, AISLE_MIN_HEIGHT_CONT, 2.3, 1.25, 0, true}},
-    {"aisle3_top",    {"a", 3, AISLE_MAX_HEIGHT_CONT, 2.3, 13.5, 0, true}},
-    {"aisle4_bottom", {"a", 4, AISLE_MIN_HEIGHT_CONT, 0.0, 0.0, 0, true}},
-    {"aisle4_top",    {"a", 4, AISLE_MAX_HEIGHT_CONT, 0.0, 0.0, 0, true}},
-    {"aisle5_bottom", {"a", 5, AISLE_MIN_HEIGHT_CONT, 0.0, 0.0, 0, true}},
-    {"aisle5_top",    {"a", 5, AISLE_MAX_HEIGHT_CONT, 0.0, 0.0, 0, true}},
-    {"aisle6_bottom", {"a", 6, AISLE_MIN_HEIGHT_CONT, 0.0, 0.0, 0, true}},
-    {"aisle6_top",    {"a", 6, AISLE_MAX_HEIGHT_CONT, 0.0, 0.0, 0, true}},
-    {"aisle7_bottom", {"a", 7, AISLE_MIN_HEIGHT_CONT, 0.0, 0.0, 0, true}},
-    {"aisle7_top",    {"a", 7, AISLE_MAX_HEIGHT_CONT, 0.0, 0.0, 0, true}},
-    {"aisle8_bottom", {"a", 8, AISLE_MIN_HEIGHT_CONT, 0.0, 0.0, 0, true}},
-    {"aisle8_top",    {"a", 8, AISLE_MAX_HEIGHT_CONT, 0.0, 0.0, 0, true}},
-    {"aisle9_bottom", {"a", 9, AISLE_MIN_HEIGHT_CONT, 0.0, 0.0, 0, true}},
-    {"aisle9_top",    {"a", 9, AISLE_MAX_HEIGHT_CONT, 0.0, 0.0, 0, true}},
-    
+};
+
+// i know this looks fucking stupid having a map to map the keys of another map, but i had to change the keys for the store_map above to ints the night before demo and this is the quickest fix without having to change my waypoint ordering and management scripts based on key name parsing
+std::unordered_map<int, std::string> index_to_item_name_map = {
+    {0, "milk"},
+    {1, "bread"},
+    {2, "eggs"},
+    {3, "chicken"},
+    {4, "banana"},
+    {5, "cereal"},
+    {6, "coffee"},
+    {7, "carrot"},
+    {8, "fish"},
+    {9, "cheese"},
+    {10, "start_pose"},
+    {11, "final_pose"},
+    {12, "aisle1_bottom"},
+    {13, "aisle1_top"},
+    {14, "aisle2_bottom"},
+    {15, "aisle2_top"},
+    {16, "aisle3_bottom"},
+    {17, "aisle3_top"},
+    {18, "aisle4_bottom"},
+    {19, "aisle4_top"},
+ 
 };
