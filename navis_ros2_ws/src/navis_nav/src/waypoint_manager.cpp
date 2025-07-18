@@ -67,7 +67,7 @@ private:
     bool got_list;
 
     std::condition_variable cv_;
-    float goal_threshold = 0.5; // meters
+    float goal_threshold = 2.0; // meters
 
     bool five_meter_flag = false;
 
