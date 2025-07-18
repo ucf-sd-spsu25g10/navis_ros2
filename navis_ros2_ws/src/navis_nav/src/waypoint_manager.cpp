@@ -113,12 +113,18 @@ private:
             process_waypoint_logic();
             RCLCPP_INFO(this->get_logger(), "Waypoint reached. Navigating to next waypoint.");
         } else if (distance_to_goal < 5.0 && !five_meter_flag) {
+            auto control_msg = navis_msgs::msg::ControlOut();
+            control_msg.buzzer_strength = 0;
             std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
             control_msg.speaker_wav_index = wav_map_.at("straight");
             speaker_publisher_->publish(control_msg);
 
+            if (distance_to_goal < 1.0) {
+                distance_to_goal = 1.0;
+            }
+
             std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-            control_msg.speaker_wav_index = wav_map_.at(std::to_string(static_cast<int>(distance_to_goal)););
+            control_msg.speaker_wav_index = wav_map_.at(std::to_string(static_cast<int>(distance_to_goal)));
             speaker_publisher_->publish(control_msg);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
