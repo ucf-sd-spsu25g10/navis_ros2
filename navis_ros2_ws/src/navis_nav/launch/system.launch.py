@@ -44,7 +44,7 @@ def generate_launch_description():
     )
 
     # 3. Low-Level Planning, Control, and Hardware Interfacing Nodes
-    Node(
+    obstacle_detector = Node(
         package='stereo_cam',
         executable='obstacle_detector',
     ),
@@ -66,4 +66,5 @@ def generate_launch_description():
         # controller_manager,
         # spawn_gpio_controller,
         control_out_node,
+        obstacle_detector
     ])
