@@ -106,7 +106,7 @@ std::vector<std::string> WaypointOrderer::get_list() {
 
 std::vector<int> WaypointOrderer::get_list_uart() {
   std::vector<int> numbers;
-  const char* uart_dev = "/dev/ttyAMA1";  // RPi5 UART port
+  const char* uart_dev = "/dev/ttyAMA0";  // RPi5 UART port
   
   int uart_fd = open(uart_dev, O_RDONLY | O_NOCTTY);
   if (uart_fd < 0) {

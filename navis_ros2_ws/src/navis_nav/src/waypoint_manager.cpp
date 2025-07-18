@@ -69,44 +69,13 @@ private:
     std::condition_variable cv_;
     float goal_threshold = 0.5; // meters
 
+    bool five_meter_flag = false;
+
     #include "navis_nav/audio_mappings.hpp"
 
     int sleep_time_ms = 250;
 
     const std::unordered_map<std::string, int>& wav_map_;
-
-    // true = x, false = y
-    void add_go_straight_cmd(bool x_or_y) {
-        navis_msgs::msg::ControlOut control_msg;
-        control_msg.buzzer_strength = 0;
-        int distance_to_next = 0;
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-
-        if (x_or_y) {
-            distance_to_next = std::min(10.0f, 
-                               std::round(std::abs(store_map[waypoint_list[cur_waypoint_idx+1]].disc_y - 
-                                                   store_map[waypoint_list[cur_waypoint_idx]].disc_y)));
-        } else {
-            distance_to_next = std::min(10.0f, 
-                               std::round(std::abs(store_map[waypoint_list[cur_waypoint_idx+1]].disc_y - 
-                                                   store_map[waypoint_list[cur_waypoint_idx]].disc_y)));
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-        control_msg.speaker_wav_index = wav_map_.at("straight");
-        speaker_publisher_->publish(control_msg);
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-        control_msg.speaker_wav_index = wav_map_.at(std::to_string(distance_to_next));
-        speaker_publisher_->publish(control_msg);
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
-        control_msg.speaker_wav_index = wav_map_.at("meters");
-        speaker_publisher_->publish(control_msg);
-
-        RCLCPP_INFO(this->get_logger(), "Indicating go straight %d meters", distance_to_next);
-    }
 
     void get_list() {
         if (!got_list) {
@@ -140,8 +109,23 @@ private:
         float distance_to_goal = std::sqrt(std::pow(goal_x - loc_x, 2) + std::pow(goal_y - loc_y, 2));
 
         if (distance_to_goal < goal_threshold) {
+            five_meter_flag = false;
             process_waypoint_logic();
             RCLCPP_INFO(this->get_logger(), "Waypoint reached. Navigating to next waypoint.");
+        } else if (distance_to_goal < 5.0 && !five_meter_flag) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+            control_msg.speaker_wav_index = wav_map_.at("straight");
+            speaker_publisher_->publish(control_msg);
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+            control_msg.speaker_wav_index = wav_map_.at(std::to_string(static_cast<int>(distance_to_goal)););
+            speaker_publisher_->publish(control_msg);
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+            control_msg.speaker_wav_index = wav_map_.at("meters");
+            speaker_publisher_->publish(control_msg);
+
+            five_meter_flag = true;
         } else {
             // Get absolute angle of line from current location to next waypoint
 
@@ -241,10 +225,8 @@ private:
             std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
             control_msg.speaker_wav_index = wav_map_.at(std::to_string(store_map[cur_waypoint_str].shelf_height));
             speaker_publisher_->publish(control_msg);
-            
-            RCLCPP_INFO(this->get_logger(), "Item %s Reached, Indicating shelf %d, Indicating on side %s", cur_waypoint_str.c_str(), store_map[cur_waypoint_str].shelf_height, l_r_str.c_str());
 
-            add_go_straight_cmd(false);
+            RCLCPP_INFO(this->get_logger(), "Item %s Reached, Indicating shelf %d, Indicating on side %s", cur_waypoint_str.c_str(), store_map[cur_waypoint_str].shelf_height, l_r_str.c_str());
 
         }
 
@@ -259,8 +241,6 @@ private:
             std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
             control_msg.speaker_wav_index = wav_map_.at(l_r);
             speaker_publisher_->publish(control_msg);
-            
-            add_go_straight_cmd(true);
         }
         
         cur_waypoint_idx++;
@@ -277,6 +257,8 @@ private:
         next_goal_msg.pose.orientation.y = 0.0;
         next_goal_msg.pose.orientation.z = 0.0;
         next_goal_msg.pose.orientation.w = 1.0;
+
+        waypoint_publisher_->publish(next_goal_msg);
 
         RCLCPP_INFO(this->get_logger(), "New goal: (%.2f, %.2f)", 
             store_map[waypoint_list[cur_waypoint_idx]].cont_x,
