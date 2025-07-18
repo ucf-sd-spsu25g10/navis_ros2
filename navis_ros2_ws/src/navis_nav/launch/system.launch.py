@@ -44,19 +44,10 @@ def generate_launch_description():
     )
 
     # 3. Low-Level Planning, Control, and Hardware Interfacing Nodes
-    # controller_manager = Node(
-    #     package="controller_manager",
-    #     executable="ros2_control_node",
-    #     parameters=[os.path.join(navis_nav_path, "config", "gpio_controller.yaml")],
-    #     output="screen",
-    # )
-
-    # spawn_gpio_controller = Node(
-    #     package="controller_manager",
-    #     executable="spawner",
-    #     arguments=["gpio_controller"],
-    #     output="screen",
-    # )
+    Node(
+        package='stereo_cam',
+        executable='obstacle_detector',
+    ),
 
     control_out_node = Node(
         package='navis_nav',

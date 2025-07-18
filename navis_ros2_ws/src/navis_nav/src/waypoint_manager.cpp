@@ -202,9 +202,9 @@ private:
 
         // Final Waypoint
         else if (cur_waypoint_idx + 1 == number_of_waypoints) {
+            RCLCPP_INFO(this->get_logger(), "Final Waypoint Reached, %s", cur_waypoint_str.c_str());
             control_msg.speaker_wav_index = wav_map_.at("final");
             speaker_publisher_->publish(control_msg);
-            RCLCPP_INFO(this->get_logger(), "Final Waypoint Reached, %s", cur_waypoint_str.c_str());
         }
 
         // Item 
