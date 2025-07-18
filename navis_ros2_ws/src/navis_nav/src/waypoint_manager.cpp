@@ -27,7 +27,7 @@ public:
     {
         RCLCPP_INFO(this->get_logger(), "WaypointManager node has been created");
 
-        waypoint_publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("/goal", 10);
+        waypoint_publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("/goal_pose", 10);
         speaker_publisher_ = this->create_publisher<navis_msgs::msg::ControlOut>("/control_output", 10);
         buzzer_publisher_ = this->create_publisher<navis_msgs::msg::ControlOut>("/control_output", 10);
 
