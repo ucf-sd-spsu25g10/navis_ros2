@@ -95,7 +95,7 @@ def generate_launch_description():
             ),
             launch_arguments={
                 'use_raspi': LaunchConfiguration('use_raspi'),
-                'enable_disparity': 'false',
+                'enable_disparity': 'true',
                 'log_level': LaunchConfiguration('log_level')
             }.items()
         ),

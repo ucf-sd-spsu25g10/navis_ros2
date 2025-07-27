@@ -21,6 +21,8 @@ find_package(hardware_interface REQUIRED)
 find_package(controller_manager REQUIRED)
 find_package(gpio_controllers REQUIRED)
 find_package(robot_state_publisher REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(stereo_msgs REQUIRED)
 
 # Include paths
 include_directories(include)
@@ -34,6 +36,10 @@ add_executable(waypoint_manager
   src/waypoint_manager.cpp
   src/grocery_locations.cpp
   src/waypoint_orderer.cpp
+)
+
+add_executable(obstacle_detector 
+  src/obstacle_detection_node.cpp
 )
 
 # Include dirs per target
@@ -63,10 +69,20 @@ ament_target_dependencies(control_out_node
   navis_msgs
 )
 
+ament_target_dependencies(obstacle_detector 
+  rclcpp 
+  sensor_msgs 
+  std_msgs 
+  cv_bridge
+  stereo_msgs
+  navis_msgs
+)
+
 # Install executables
 install(TARGETS 
   control_out_node
   waypoint_manager
+  obstacle_detector
   DESTINATION lib/${PROJECT_NAME}
 )
 

@@ -198,6 +198,8 @@ private:
         // First Waypoint
         if (cur_waypoint_idx == -1) {
             RCLCPP_INFO(this->get_logger(), "Preprocessing starting waypoint");
+            control_msg.speaker_wav_index = wav_map_.at("first");
+            speaker_publisher_->publish(control_msg);
         }
 
         // Final Waypoint

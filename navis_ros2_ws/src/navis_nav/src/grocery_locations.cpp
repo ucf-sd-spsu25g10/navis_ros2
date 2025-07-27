@@ -27,9 +27,9 @@ std::unordered_map<std::string, Item> store_map = {
 
     {"aisle1_bottom",   {12, 1, AISLE_MIN_HEIGHT_CONT, 2.3, 0.1, 0, true}},
     {"aisle1_top",      {13, 1, AISLE_MAX_HEIGHT_CONT, 42.2, -9.2, 0, true}},
-    {"aisle2_bottom",   {14, 2, AISLE_MIN_HEIGHT_CONT, -0.4, -13.8, 0, true}},
+    {"aisle2_bottom",   {14, 2, AISLE_MIN_HEIGHT_CONT, -1.4, -13.8, 0, true}},
     {"aisle2_top",      {15, 2, AISLE_MAX_HEIGHT_CONT, 39.6, -24.8, 0, true}},
-    {"aisle3_bottom",   {16, 3, AISLE_MIN_HEIGHT_CONT, -1.3, -25.3, 0, true}},
+    {"aisle3_bottom",   {16, 3, AISLE_MIN_HEIGHT_CONT, -3.0, -25.3, 0, true}},
     {"aisle3_top",      {17, 3, AISLE_MAX_HEIGHT_CONT, 36.2, -37.4, 0, true}},
 
     // {"item_milk",            {0,  1, 1.0, 6.4, -0.3, 1, false}},

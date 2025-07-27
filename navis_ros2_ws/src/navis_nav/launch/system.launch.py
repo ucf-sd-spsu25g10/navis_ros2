@@ -45,9 +45,10 @@ def generate_launch_description():
 
     # 3. Low-Level Planning, Control, and Hardware Interfacing Nodes
     obstacle_detector = Node(
-        package='stereo_cam',
+        package='navis_nav',
         executable='obstacle_detector',
-    ),
+        arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level')],
+    )
 
     control_out_node = Node(
         package='navis_nav',
