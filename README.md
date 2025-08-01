@@ -9,6 +9,8 @@
 ![ROS2](https://img.shields.io/badge/Middleware-ROS2-informational)
 ![RTABMap](https://img.shields.io/badge/SLAM-RTABMap-success)
 
+<img width="1856" height="1096" alt="image" src="https://github.com/user-attachments/assets/97f45d90-9780-42ac-897a-92dad1c57f97" />
+
 
 ---
 
