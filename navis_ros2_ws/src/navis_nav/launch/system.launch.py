@@ -64,8 +64,6 @@ def generate_launch_description():
 
         waypoint_manager_delayed,
         slam,
-        # controller_manager,
-        # spawn_gpio_controller,
         control_out_node,
         obstacle_detector
     ])

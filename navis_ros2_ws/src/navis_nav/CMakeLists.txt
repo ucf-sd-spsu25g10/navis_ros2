@@ -19,7 +19,6 @@ find_package(rosbag2_cpp REQUIRED)
 find_package(ros2_control REQUIRED)
 find_package(hardware_interface REQUIRED)
 find_package(controller_manager REQUIRED)
-find_package(gpio_controllers REQUIRED)
 find_package(robot_state_publisher REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(stereo_msgs REQUIRED)
@@ -39,7 +38,7 @@ add_executable(waypoint_manager
 )
 
 add_executable(obstacle_detector 
-  src/obstacle_detection_node.cpp
+  src/obstacle_detection.cpp
 )
 
 # Include dirs per target
@@ -60,7 +59,6 @@ ament_target_dependencies(waypoint_manager
   ros2_control
   hardware_interface
   controller_manager
-  gpio_controllers
 )
 
 ament_target_dependencies(control_out_node 
